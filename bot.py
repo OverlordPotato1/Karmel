@@ -1,6 +1,5 @@
 import datetime
 import os
-import time
 import openai
 import youtube_dl
 import asyncio
@@ -20,31 +19,7 @@ memory = {}
 #                                       #
 #########################################
 
-def downloadYoutube(url):
-    video_url = url
-    video_info = youtube_dl.YoutubeDL().extract_info(url = video_url,download=False)
-    filename = f"{video_info['title']}.mp3"
-    options={
-        'format':'bestaudio/best',
-        'keepvideo':False,
-        'outtmpl':filename,
-    }
-    with youtube_dl.YoutubeDL(options) as ydl:
-        ydl.download([video_info['webpage_url']])
-    print("Download complete... {}".format(filename))
-    return filename
- 
-def searchForYoutubeUrl(message):
-    if "https://www.youtube.com/watch?v=" in message:
-        return message
-    else:
-        # use youtube_dl to search for the video and return the url
-        with youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'}) as ydl:
-            result = ydl.extract_info(
-                'ytsearch:%s' % message,
-                download=False # We just want to extract the info
-            )
-        return "https://www.youtube.com/watch?v=" + result['entries'][0]['id']
+
 
 def determineSource(message):
     if "https://www.youtube.com/watch?v=" in message:

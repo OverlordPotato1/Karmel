@@ -127,7 +127,7 @@ async def gptWithMemory(message):
         #save memory to file with json
         files.saveJson("memory.json", memory)
     except:
-        await message.channel.send("An error occured!\nGPT-3 will be run without memory")
+        await message.channel.send("An error occurred.  Please file a bug report at ")
         await gptWithoutMemory(message)
         raise
 
