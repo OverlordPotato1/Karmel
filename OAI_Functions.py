@@ -1,3 +1,4 @@
+import traceback
 import openai
 import discord
 import files
@@ -5,6 +6,8 @@ from variables import *
 from discord import app_commands
 import datetime
 import asyncio
+import interactions
+from misc_functions import asyncErr
 
 openai.api_key = files.loadJson("tokens.json")["openai"]
 
@@ -67,10 +70,9 @@ async def gptWithoutMemory(message):
         return
     async with message.channel.typing():
             prompt = message.content.replace("Karmel, ", "")
-            print('Sending prompt: "' + prompt + '" to OpenAI')
             response = openai.Completion.create(
                 engine="text-davinci-003",
-                prompt=prompt,
+                prompt="USER: "+prompt+"\nKARMEL: ",
                 n=1,
                 max_tokens=400
             )
@@ -127,8 +129,8 @@ async def gptWithMemory(message):
         #save memory to file with json
         files.saveJson("memory.json", memory)
     except:
-        await message.channel.send("An error occurred.  Please file a bug report at ")
+        await asyncErr(message, traceback.format_exc())
         await gptWithoutMemory(message)
-        raise
+
 
 
