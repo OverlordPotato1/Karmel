@@ -473,9 +473,7 @@ async def on_message(message):
             await message.channel.send(embed=embed)
             memory[str(message.author.id)]["dmDisclaimer"] = "true"
             files.saveJson("memory.json", memory)
-            return
-        else:
-            await activated(message)
+        await activated(message)
 
         #if they have not been defined, define them
 
