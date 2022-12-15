@@ -5,6 +5,7 @@ import datetime
 import asyncio
 from user_management import *
 from OAI_Functions import *
+import wit_Handling
 
 
 async def activated(message, isPing=False):
@@ -12,6 +13,8 @@ async def activated(message, isPing=False):
     memory = files.loadJson("memory.json")
     if str(message.author.id) not in memory:
         memory[str(message.author.id)] = {}
+        memory[str(message.author.id)]["name"] = ""
+        memory[str(message.author.id)]["gender"] = ""
         memory[str(message.author.id)]["defining"] = "false"
         memory[str(message.author.id)]["imageCount"] = 0
         memory[str(message.author.id)]["allowImage"] = "true"
@@ -26,15 +29,19 @@ async def activated(message, isPing=False):
 
     if message.author.bot:
         return
-    # ensure its not a @everyone or @here ping
 
-    if isPing == True and "<@"+str(client.user.id)+">" not in message.content:
+    # ensure its not a @everyone or @here ping
+    if isPing == True and "<@"+str(client.user.id)+">" not in message.content and "<@!"+str(client.user.id)+">" not in message.content:
         print("ignoring @everyone ping")
         return
     newMessage = message.content.replace("Karmel, ", "")
     # remove karmel's ping
     newMessage = newMessage.replace("<@!"+str(client.user.id)+">", "")
     newMessage = newMessage.lower()
+
+    response = await wit_Handling.CAR(message)
+    embed = discord.Embed(title="Wit.ai intents analysis", description=response, color=0x00ff00)
+    await message.channel.send(embed=embed)
 
     if newMessage == "define me":
 
@@ -69,14 +76,11 @@ async def activated(message, isPing=False):
 
     if newMessage == "who am i":
         # read memory from file "memory.json" using json
-        with open("memory.json") as f:
-            memory = f.read()
-        f.close()
-        memory = files.json.loads(memory)
+        memory = files.loadJson("memory.json")
         author = str(message.author.id)
         # if the user is in the dictionary memory, tell them their name
         if author in memory:
-            await message.channel.send("{'<@" +str(author) + ">': " + str(memory[author]) + "}")
+            await message.channel.send("{'<@" + str(author) + ">': " + str(memory[author]) + "}")
         else:
             await message.channel.send("I don't know, do you wish to be defined?")
             # wait for a response
@@ -90,15 +94,9 @@ async def activated(message, isPing=False):
         # ensure the user has the id 441688723344719882
         if message.author.id == 441688723344719882:
             # read memory from file "memory.json" using json
-            with open("memory.json") as f:
-                memory = f.read()
-            f.close()
-            memory = files.json.loads(memory)
+            memory = files.loadJson("memory.json")
             # read servers from file "servers.json" using json
-            with open("servers.json") as f:
-                servers = f.read()
-            f.close()
-            servers = files.json.loads(servers)
+            servers = files.loadJson("servers.json")
             # for each server in servers
             for server in servers:
                 # get the server object
@@ -109,9 +107,7 @@ async def activated(message, isPing=False):
                     if str(member.id) not in memory:
                         memory[str(member.id)] = member.name
             # save memory to file with json
-            with open("memory.json", "w") as f:
-                f.write(files.json.dumps(memory))
-            f.close()
+            files.saveJson("memory.json", memory)
             await message.channel.send("Synced commands with servers")
         else:
             await message.channel.send("You do not have permission to do that")
