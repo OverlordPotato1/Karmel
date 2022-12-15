@@ -338,6 +338,8 @@ async def activated(message, isPing=False):
         # remove "with codex" from the message
         message.content = newMessage.replace("with codex ", "")
         # send the message to use_codex
-        await use_codex(message)
+        async with message.channel.typing():
+            await use_codex(message)
+        return
 
     await gptWithMemory(message)
