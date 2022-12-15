@@ -15,28 +15,38 @@ openai.api_key = files.loadJson("tokens.json")["openai"]
 # Function that will send a prompt to GPT-3 and return the response (Call and Response) ##
 ###########################################################################################
 
-async def CAR(prompt, max_tokens=300, engine="text-davinci-003"):
+async def CAR(prompt, maxTokens=300, engine="text-davinci-003", temperature=0.9):
     # send the prompt to OpenAI and get the response
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        temperature=0.9,
-        max_tokens=300
-    )
+    try:
+        response = openai.Completion.create(
+            engine=engine,
+            prompt=prompt,
+            temperature=temperature,
+            max_tokens=maxTokens
+        )
+        isRateLimit = False
+    except:
+        isRateLimit = True
     # return the response
-    return response
+    return response, isRateLimit
 
 ############################################################################################################################################################################
 # Function to request information from Codex instead of GPT-3 ##
 ################################################################
 
 async def use_codex(prompt):
-    prompt = prompt.content
+    prompt.content = "Q: "+prompt.content+"\nA:"
     # using CAR, send the prompt to Codex
-    response = await CAR(prompt, engine="code-davinci-002")
-    # return the response
-    embed = discord.Embed(title="Codex Response", description=response.choices[0].text, color=0x00ff00)
-    embed.footer = "Powered by OpenAI Codex, please note this may not be accurate or relevant.\nUse at your own risk."
+    response, isRateLimit = await CAR(prompt.content, engine="code-davinci-002", maxTokens=4000)
+    # replace <code> tags with code blocks
+    if not isRateLimit:
+        response.choices[0].text = response.choices[0].text.replace("<code>", "```").replace("</code>", "```")
+        # return the response
+        embed = discord.Embed(title="Codex Response", description=response.choices[0].text, color=0x00ff00)
+        # set the footer of the embed to include a disclaimer
+        embed.set_footer(text="Code created by Codex. The functionality and safety of this code cannot be guaranteed.  Use at your own risk.")
+    else:
+        embed = discord.Embed(title="Codex Error", description="Codex is currently rate limited. Please try again later.", color=0xff0000)
     await prompt.channel.send(embed=embed)
     return
 
