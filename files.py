@@ -1,5 +1,18 @@
 import json
 
+class async_dictionary():
+    def __init__(self, file):
+        self.file = file
+        self.dictionary = loadJson(file)
+
+    async def OTF_set(self, category: str, variable: str, value):
+        self.dictionary[category][variable] = value
+
+    async def OTF_get(self, category: str, variable: str):
+        return self.dictionary[category][variable]
+        
+
+
 def loadJson(filename):
     try:
         print("Reading from " + filename)
@@ -21,3 +34,4 @@ def saveJson(filename, data):
     except:
         print("Error writing to " + filename)
         return {}
+

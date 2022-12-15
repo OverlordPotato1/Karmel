@@ -27,6 +27,20 @@ async def CAR(prompt, max_tokens=300, engine="text-davinci-003"):
     return response
 
 ############################################################################################################################################################################
+# Function to request information from Codex instead of GPT-3 ##
+################################################################
+
+async def use_codex(prompt):
+    prompt = prompt.content
+    # using CAR, send the prompt to Codex
+    response = await CAR(prompt, engine="code-davinci-002")
+    # return the response
+    embed = discord.Embed(title="Codex Response", description=response.choices[0].text, color=0x00ff00)
+    embed.footer = "Powered by OpenAI Codex, please note this may not be accurate or relevant.\nUse at your own risk."
+    await prompt.channel.send(embed=embed)
+    return
+
+############################################################################################################################################################################
 # Function that checks if a message is in violation of OpenAI's content policy ##
 #################################################################################
 

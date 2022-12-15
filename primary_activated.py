@@ -334,4 +334,10 @@ async def activated(message, isPing=False):
             files.saveJson("memory.json", memory)
         return
 
+    if newMessage.split(" ")[0] == "with" and newMessage.split(" ")[1] == "codex":
+        # remove "with codex" from the message
+        message.content = newMessage.replace("with codex ", "")
+        # send the message to use_codex
+        await use_codex(message)
+
     await gptWithMemory(message)
