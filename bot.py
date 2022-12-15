@@ -8,6 +8,7 @@ from OAI_Functions import *
 from variables import *
 from primary_activated import *
 import discord
+import wit_Handling
 
 bot = app_commands.CommandTree(client)
 
@@ -435,6 +436,9 @@ async def on_message(message):
     if message.author == client.user:
         return
     
+    intentions = await wit_Handling.CAR(message)
+
+        
     async def fixShitFast():
         memory = files.loadJson("memory.json")
         if str(message.author.id) not in memory: #if the user is not in memory.json yet, add them
@@ -462,9 +466,19 @@ async def on_message(message):
     
     if client.user.mentioned_in(message):
         await activated(message, isPing=True)
-
+        return
+    
     if firstWord in activate and not client.user.mentioned_in(message):
         await activated(message)
+        return
+
+    # if intentions["intents"][0]["name"] == "karmel_summon":
+    #     message.content = intentions["entities"]["content:content"][0]["value"]
+    #     embed = discord.Embed(title="Wit.ai detected intention karmel_summon", description="This action is still in development and misunderstandings are expected", color=0x00ff00)
+    #     embed.add_field(name="Passed Prompt", value=message.content)
+    #     await message.channel.send(embed=embed)
+    #     await activated(message)
+    #     return
 
     if guildName == "DM":
         memory = files.loadJson("memory.json")
