@@ -2,6 +2,7 @@ import traceback
 import openai
 import discord
 import files
+from files import async_dictionary
 from variables import *
 from discord import app_commands
 import datetime
@@ -145,10 +146,8 @@ async def gptWithoutMemory(message):
 
 async def gptWithMemory(message):
 
-    memory = files.loadJson("memory.json")
-
     # prevents the bot to responding to things while another thread recieves input for a command
-    if memory[str(message.author.id)]["defining"] == "true":
+    if await global_memory.read_dict(str(message.author.id), "defining") == "true":
             return
 
     # remove the any form of the activation word from the message
@@ -172,15 +171,15 @@ async def gptWithMemory(message):
     try:
         
         try:
-            test = memory[message.author.id]["message"]
+            test = await global_memory.read_dict(str(message.author.id), "message")
         except:
-            memory[str(message.author.id)]["message"] = "NONE"
-            memory[str(message.author.id)]["response"] = "NONE"
+            await global_memory.set_dict(str(message.author.id), "message", "NONE")
+            await global_memory.set_dict(str(message.author.id), "response", "NONE")
 
         author = str(message.author.id)
-        aName = memory[author]["name"]
-        aGender = memory[author]["gender"]
-        frstSeen = memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + " UTC"
+        aName = await global_memory.read_dict(author, "name")
+        aGender = await global_memory.read_dict(author, "gender")
+        frstSeen = await global_memory.read_dict(author, "definitionDOW") + " " + await global_memory(author, "definitiondate") + " UTC"
 
         # get the current time in UTC and convert it to a human readable format
         now = datetime.datetime.utcnow()
@@ -189,22 +188,16 @@ async def gptWithMemory(message):
 
         async with message.channel.typing():
             
-            prompt = "{username:" + aName + ", gender: " + aGender + ", first seen: " + memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + ' UTC}\nIt is currently '+ now + ', Server name: ' + guildName + '\n' + memory[author]["name"] + " (" + memory[author]["gender"] + "): " + memory[author]["message"] + "\n"+client.user.name+" (Female): " + memory[author]["response"] + "\n"+ memory[author]["name"] + " (" + memory[author]["gender"] + "): " + messageContent + "\n"+client.user.name+" (Female): "
-            memory[author]["message"] = messageContent
+            prompt = "{username:"+aName+", gender: "+aGender+", first seen: "+frstSeen+'}\nIt is currently '+now+', Server name: '+guildName+'\n'+aName+" ("+aGender+"): "+await global_memory(author, "message")+"\n"+client.user.name+" (Female): "+await global_memory.read_dict(author, "response")+"\n"+aName+" ("+aGender+"): "+messageContent+"\n"+client.user.name+" (Female): "
+            await global_memory.set_dict(author, "message", messageContent)
 
             print(prompt)
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
-                n=1,
-                max_tokens=200
-            )
+            response = await CAR(prompt, maxTokens=300, engine="text-davinci-003")
             print(response.choices[0].text)
-            memory[author]["response"] = response.choices[0].text
+            await global_memory.set_dict(author, "message", messageContent)
+            await global_memory.set_dict(author, "response", response.choices[0].text)
         # reply to the user with the response
         await message.channel.send(response.choices[0].text, reference=message)
-        #save memory to file with json
-        files.saveJson("memory.json", memory)
     except:
         await asyncErr(message, traceback.format_exc())
         await gptWithoutMemory(message)

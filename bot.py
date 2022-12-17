@@ -1,7 +1,6 @@
 import datetime
 import os
 import openai
-import youtube_dl
 import asyncio
 import files
 from OAI_Functions import *
@@ -12,25 +11,6 @@ import wit_Handling
 
 bot = app_commands.CommandTree(client)
 
-memory = {}
-
-#########################################
-#                                       #
-#   Definitions                         #
-#                                       #
-#########################################
-
-
-
-def determineSource(message):
-    if "https://www.youtube.com/watch?v=" in message:
-        return "youtube"
-    elif "https://open.spotify.com/track/" in message:
-        #if its a spotify link
-        return "spotify"
-    else:
-        return message
-        
 #########################################
 #                                       #
 #   Bot Commands                        #
@@ -440,27 +420,23 @@ async def on_message(message):
 
         
     async def fixShitFast():
-        memory = files.loadJson("memory.json")
         if str(message.author.id) not in memory: #if the user is not in memory.json yet, add them
-            memory[str(message.author.id)] = {}
-            memory[str(message.author.id)]["defining"] = "false"
-            memory[str(message.author.id)]["imageCount"] = 0
-            memory[str(message.author.id)]["allowImage"] = "true"
-            memory[str(message.author.id)]["imageLastUsed"] = "0"
-            memory[str(message.author.id)]["dmDisclaimer"] = "false"
+            await global_memory.set_dict(str(message.author.id), "defining", "false")
+            await global_memory.set_dict(str(message.author.id), "imageCount", 0)
+            await global_memory.set_dict(str(message.author.id), "allowImage", "true")
+            await global_memory.set_dict(str(message.author.id), "imageLastUsed", "0")
+            await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "false")
         try:
             guildName = message.guild.name #get the server name
         except: #if the message is not in a server, it is a DM
             guildName = "DM" #set the server name to DM
-        try:
-            test = memory[str(message.author.id)]["dmDisclaimer"]
-        except:
-            memory[str(message.author.id)]["dmDisclaimer"] = "false"
+            
+        if not global_memory.checkExists_variable(str(message.author.id), "dmDisclaimer"):
+            await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "false")
 
-        files.saveJson("memory.json", memory)
-        return guildName, memory
+        return guildName
     
-    guildName, memory = await fixShitFast()
+    guildName = await fixShitFast()
 
     firstWord = message.content.split()[0].lower()
     

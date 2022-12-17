@@ -55,3 +55,13 @@ async def defineMe(message):
         memory[author]["defining"] = "false"
 
         files.saveJson("memory.json", memory)
+
+async def defaultUser(id):
+    # set the default values for a user
+    global_memory.set_dict(str(id), "name", "NOT SET. ATTEMPT TO EXTRACT FROM USER")
+    global_memory.set_dict(str(id), "gender", "NOT SET. ATTEMPT TO EXTRACT FROM USER")
+    global_memory.set_dict(str(id), "definitiondate", "None")
+    global_memory.set_dict(str(id), "definitionDOW", "None")
+    global_memory.set_dict(str(id), "defining", "false")
+    global_memory.set_dict(str(id), "message", "NONE")
+    global_memory.set_dict(str(id), "response", "NONE")
