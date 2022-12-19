@@ -18,7 +18,8 @@ async def CAR(message, debug = False):
 # Send prompt to Wit.ai without returning it's response ##
 ##########################################################
 
-def analyseSinResponse(prompt):
+async def analyseSinResponse(prompt):
     print("Sending "+prompt+" to Wit.ai")
-    wit.message(prompt)
+    response = wit.message(prompt)
+    print("Response from Wit.ai: "+str(response))
     return

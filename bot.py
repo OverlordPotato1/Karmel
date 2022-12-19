@@ -416,7 +416,9 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    wit_Handling.analyseSinResponse(message.content)
+    # call wit_Handling.analyseSinResponse(message.content) without waiting for it to finish
+    asyncio.ensure_future(wit_Handling.analyseSinResponse(message.content))
+    
 
         
     async def fixShitFast():
@@ -457,15 +459,11 @@ async def on_message(message):
     #     return
 
     if guildName == "DM":
-        memory = files.loadJson("memory.json")
-        if memory[str(message.author.id)]["dmDisclaimer"] != "true":
+        if global_memory.read_dict(str(message.author.id), "dmDisclaimer") == "false":
             embed = discord.Embed(title="Karmel is not meant to be used in DMs", description='Only chat bot actions will be available\nMessages will not require the "Karmel, " prefix\nThis message will not be shown again', color=0xe74c3c)
             await message.channel.send(embed=embed)
-            memory[str(message.author.id)]["dmDisclaimer"] = "true"
-            files.saveJson("memory.json", memory)
+            global_memory.set_dict(str(message.author.id), "dmDisclaimer", "true")
         await activated(message)
-
-        #if they have not been defined, define them
 
     
     

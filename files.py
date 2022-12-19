@@ -31,6 +31,11 @@ class async_dictionary():
     async def reload(self):
         self.dictionary = loadJson(self.file)
         # for when im to lazy to find and replace the parts that just read directly from the file and save to it
+
+    async def add_dict(self, category: str, variable: str, value):
+        if category not in self.dictionary:
+            self.dictionary[category] = {}
+        self.dictionary[category][variable] += value
         
 
 

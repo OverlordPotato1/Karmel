@@ -10,6 +10,9 @@ import wit_Handling
 
 async def activated(message, isPing=False):
 
+    timeUTC = datetime.datetime.utcnow()
+    timeDay = timeUTC.strftime("%Y-%m-%d")
+    timeSubDay = timeUTC.strftime("%H:%M:%S")
     authorId = str(message.author.id)
 
     if not await global_memory.checkExists_category(authorId):
@@ -232,86 +235,67 @@ async def activated(message, isPing=False):
         return
 
     if newMessage == "draw a picture":
-        skipCheck = False
 
-        memory = files.loadJson("memory.json")
-        # give the user the defining status
-        memory[str(message.author.id)]["defining"] = "true"
-        files.saveJson("memory.json", memory)
-        try:
-            test = memory[str(message.author.id)]["allowImage"]
-        except:
-            memory[str(message.author.id)]["allowImage"] = "true"
-            memory[str(message.author.id)]["imageCount"] = 0
-            memory[str(message.author.id)]["imageLastUsed"] = "Never"
-            files.saveJson("memory.json", memory)
-        # check if the user has the allowImage status
-        memory = files.loadJson("memory.json")
-        now = datetime.datetime.utcnow()
-        now = now.strftime("%Y-%m-%d")
-
-        if memory[str(message.author.id)]["imageLastUsed"] != now:
-            memory[str(message.author.id)]["imageCount"] = 0
-            memory[str(message.author.id)]["allowImage"] = "true"
-            # get the current date in d/m/y format
-            now = datetime.datetime.utcnow()
-            now = now.strftime("%Y-%m-%d %H:%M:%S")
-            memory[str(message.author.id)]["imageLastUsed"] = now
-
-            
-            files.saveJson("memory.json", memory)
-            skipCheck = True
-
-        if memory[str(message.author.id)]["allowImage"] == "false" and skipCheck == False:
-            embed = discord.Embed(title="Image Limit Reached", description="You have reached the image limit today", color=0xff0000)
-            embed.set_footer(text="You can use images again tomorrow")
-            await message.channel.send(embed=embed)
-            return
-        #get the current date
-        
-        
-        
-        if memory[str(message.author.id)]["imageCount"] >= 25 and skipCheck == False:
-            memory[str(message.author.id)]["allowImage"] = "false"
-            embed = discord.Embed(title="Image Limit Reached", description="You have reached the image limit today", color=0xff0000)
-            embed.set_footer(text="You can use images again tomorrow")
-            await message.channel.send(embed=embed)
-            return
-        
-        # give the bot the typing status
         async with message.channel.typing():
-            asyncio.sleep(1)
-            # ask the user what they want to draw
+            skipCheck = False
+            # give the user the defining status
+            await global_memory.set_dict(authorId, "defining", "true")
+
+
+            if not global_memory.checkExists_variable(authorId, "allowImage"):
+                await global_memory.set_dict(authorId, "allowImage", "true")
+                await global_memory.set_dict(authorId, "imageCount", 0)
+                await global_memory.set_dict(authorId, "imageLastUsed", "NEVER")
+
+
+            if await global_memory.read_dict(authorId, "imageLastUsed") != timeDay:
+                await global_memory.set_dict(authorId, "imageCount", 0)
+                await global_memory.set_dict(authorId, "allowImage", "true")
+                await global_memory.set_dict(authorId, "imageLastUsed", timeDay)
+                skipCheck = True
+
+
+            if await global_memory.read_dict(authorId, "allowImage") == "false" and skipCheck == False:
+                embed = discord.Embed(title="Image Limit Reached", description="You have reached the image limit today", color=0xff0000)
+                embed.set_footer(text="You can use images again tomorrow")
+                await message.channel.send(embed=embed)
+                return
+            
+            
+            if await global_memory.read_dict(authorId, "imageCount") >= 25 and skipCheck == False:
+                await global_memory.set_dict(authorId, "allowImage", "false")
+                embed = discord.Embed(title="Image Limit Reached", description="You have reached the image limit today", color=0xff0000)
+                embed.set_footer(text="You can use images again tomorrow")
+                await message.channel.send(embed=embed)
+                return
         
         
-        # wait for a response
+        
+
         bad = True
         while bad:
             embed = discord.Embed(title="What would you like to draw?", description="Keep it SFW", color=0x00ff00)
-            await message.channel.send(embed=embed)
+            msg = await message.channel.send(embed=embed)
             response = await client.wait_for("message", check=sameAuthor)
             bad = await isBad(response)
-        # send the prompt to openai
+            if bad:
+                rejected = discord.Embed(title="Rejected", description="Your prompt returned rejected", color=0xff0000)
+        await msg.delete()
+
         async with message.channel.typing():
             embed = discord.Embed(title="Please Wait", description="Submitting prompt to OpenAI", color=0x00ff00)
-            embed.set_footer(text="This may take a while")
+            embed.set_footer(text="This should only take a few seconds")
             msg = await message.channel.send(embed=embed)
-            await asyncio.sleep(0.2)
             image = await draw(response)
-            embed = discord.Embed(title="Image Complete", description="Processing image", color=0x00ff00)
-            await msg.edit(embed=embed)
-            await asyncio.sleep(1)
             await msg.delete()
             # send the response and reply to the original message
             embed = discord.Embed(title="Image Complete", description="", color=0x00ff00)
             # the image is a url in the variable image
             await message.channel.send(image['data'][0]['url'])
-            memory = files.loadJson("memory.json")
-            memory[str(message.author.id)]["imageCount"] += 1
-            memory[str(message.author.id)]["defining"] = "false"
-            memory[str(message.author.id)]["imageLastUsed"] = now
+            global_memory.add_dict(authorId, "imageCount", 1)
+            global_memory.set_dict(authorId, "defining" , "false")
+            global_memory.set_dict(authorId, "imageLastUsed", timeDay)
             skipCheck = False
-            files.saveJson("memory.json", memory)
         return
 
     if newMessage.split(" ")[0] == "with" and newMessage.split(" ")[1] == "codex":
@@ -321,5 +305,7 @@ async def activated(message, isPing=False):
         async with message.channel.typing():
             await use_codex(message)
         return
+
+    await global_memory.save()
 
     await gptWithMemory(message)
