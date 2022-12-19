@@ -24,6 +24,13 @@ class async_dictionary():
             return True
         else:
             return False
+
+    async def save(self):
+        saveJson(self.file, self.dictionary)
+
+    async def reload(self):
+        self.dictionary = loadJson(self.file)
+        # for when im to lazy to find and replace the parts that just read directly from the file and save to it
         
 
 

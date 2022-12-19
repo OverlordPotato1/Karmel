@@ -12,7 +12,7 @@ async def activated(message, isPing=False):
 
     authorId = str(message.author.id)
 
-    if authorId not in memory:
+    if not await global_memory.checkExists_category(authorId):
         await global_memory.set_dict(authorId, "name", "")
         await global_memory.set_dict(authorId, "gender", "")
         await global_memory.set_dict(authorId, "defining", "false")
@@ -41,7 +41,7 @@ async def activated(message, isPing=False):
     newMessage = newMessage.replace("<@"+str(client.user.id)+">", "")
     newMessage = newMessage.lower()
 
-    response = await wit_Handling.CAR(message)
+    # response = await wit_Handling.CAR(message)
 
     # if newMessage == "define me":
 
@@ -98,6 +98,7 @@ async def activated(message, isPing=False):
             await message.channel.send("Synced commands with servers")
         else:
             await message.channel.send("You do not have permission to do that")
+        global_memory.reload()
         return
 
     if newMessage == "forget our conversation":
@@ -226,6 +227,8 @@ async def activated(message, isPing=False):
             await asyncio.sleep(1)
             memory[str(message.author.id)]["defining"] = "false"
             files.saveJson("memory.json", memory)
+            # fuck this shit i didn't even write this there no way in hell i'm fixing it to use the new memory system
+            global_memory.reload()
         return
 
     if newMessage == "draw a picture":

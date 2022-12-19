@@ -29,7 +29,7 @@ async def CAR(prompt, maxTokens=300, engine="text-davinci-003", temperature=0.9)
     except:
         isRateLimit = True
     # return the response
-    return response, isRateLimit
+    return response.choices[0].text, response, isRateLimit
 
 ############################################################################################################################################################################
 # Function to request information from Codex instead of GPT-3 ##
@@ -94,8 +94,8 @@ async def isBad(message):
     return True
 
 ############################################################################################################################################################################
-# Function that sends a prompt to DALL-E2 and return the image ##
-#################################################################
+# Function that sends a prompt to DALL-E 2 and returns the image ##
+###################################################################
 
 async def draw(message):
 
@@ -175,11 +175,19 @@ async def gptWithMemory(message):
         except:
             await global_memory.set_dict(str(message.author.id), "message", "NONE")
             await global_memory.set_dict(str(message.author.id), "response", "NONE")
+        
+        try:
+            test = await global_memory.read_dict(str(message.author.id), "message-1")
+        except:
+            await global_memory.set_dict(str(message.author.id), "message-1", "NONE")
+            await global_memory.set_dict(str(message.author.id), "response-1", "NONE")
 
         author = str(message.author.id)
         aName = await global_memory.read_dict(author, "name")
         aGender = await global_memory.read_dict(author, "gender")
-        frstSeen = await global_memory.read_dict(author, "definitionDOW") + " " + await global_memory(author, "definitiondate") + " UTC"
+        frstSeen = await global_memory.read_dict(author, "definitionDOW") + " " + await global_memory.read_dict(author, "definitiondate") + " UTC"
+        clnt = client.user.name+" (Female): "
+        usr = aName+" ("+aGender+"): "
 
         # get the current time in UTC and convert it to a human readable format
         now = datetime.datetime.utcnow()
@@ -188,16 +196,19 @@ async def gptWithMemory(message):
 
         async with message.channel.typing():
             
-            prompt = "{username:"+aName+", gender: "+aGender+", first seen: "+frstSeen+'}\nIt is currently '+now+', Server name: '+guildName+'\n'+aName+" ("+aGender+"): "+await global_memory(author, "message")+"\n"+client.user.name+" (Female): "+await global_memory.read_dict(author, "response")+"\n"+aName+" ("+aGender+"): "+messageContent+"\n"+client.user.name+" (Female): "
-            await global_memory.set_dict(author, "message", messageContent)
+            prompt = "{username:"+aName+", gender: "+aGender+", first seen: "+frstSeen+'}\nIt is currently '+now+', Server name: '+guildName+'\n'+usr+ await global_memory.read_dict(author, "message-1")+'\n'+clnt+await global_memory.read_dict(author, "response-1")+'\n'+usr+await global_memory.read_dict(author, "message")+"\n"+clnt+await global_memory.read_dict(author, "response")+"\n"+aName+" ("+aGender+"): "+messageContent+"\n"+client.user.name+" (Female): "
 
             print(prompt)
-            response = await CAR(prompt, maxTokens=300, engine="text-davinci-003")
-            print(response.choices[0].text)
+            response, fullResponse, rl = await CAR(prompt)
+            print(response)
+            await global_memory.set_dict(author, "response-1", await global_memory.read_dict(author, "response"))
+            await global_memory.set_dict(author, "response", response)
+            await global_memory.set_dict(author, "message-1", await global_memory.read_dict(author, "message"))
             await global_memory.set_dict(author, "message", messageContent)
-            await global_memory.set_dict(author, "response", response.choices[0].text)
+            await global_memory.save()
+
         # reply to the user with the response
-        await message.channel.send(response.choices[0].text, reference=message)
+        await message.channel.send(response, reference=message)
     except:
         await asyncErr(message, traceback.format_exc())
         await gptWithoutMemory(message)

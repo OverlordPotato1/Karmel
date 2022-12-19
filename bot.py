@@ -416,11 +416,11 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    intentions = await wit_Handling.CAR(message)
+    wit_Handling.analyseSinResponse(message.content)
 
         
     async def fixShitFast():
-        if str(message.author.id) not in memory: #if the user is not in memory.json yet, add them
+        if await global_memory.checkExists_category(str(message.author.id)): #if the user is not in memory.json yet, add them
             await global_memory.set_dict(str(message.author.id), "defining", "false")
             await global_memory.set_dict(str(message.author.id), "imageCount", 0)
             await global_memory.set_dict(str(message.author.id), "allowImage", "true")
@@ -431,7 +431,7 @@ async def on_message(message):
         except: #if the message is not in a server, it is a DM
             guildName = "DM" #set the server name to DM
             
-        if not global_memory.checkExists_variable(str(message.author.id), "dmDisclaimer"):
+        if not await global_memory.checkExists_variable(str(message.author.id), "dmDisclaimer"):
             await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "false")
 
         return guildName
