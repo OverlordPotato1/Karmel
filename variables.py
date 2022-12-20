@@ -16,8 +16,7 @@ intents = discord.Intents(messages=True, guilds=True, members=True, presences=Tr
 
 client = discord.Client(intents=intents)
 
-# bot = interactions.Client(token=files.loadJson("tokens.json")["discord"], intents=intents)
-
+global_memory = files.async_dictionary("memory.json")
 
 
 

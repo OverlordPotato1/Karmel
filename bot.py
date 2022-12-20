@@ -1,35 +1,16 @@
 import datetime
 import os
 import openai
-import youtube_dl
 import asyncio
 import files
 from OAI_Functions import *
 from variables import *
 from primary_activated import *
 import discord
+import wit_Handling
 
 bot = app_commands.CommandTree(client)
 
-memory = {}
-
-#########################################
-#                                       #
-#   Definitions                         #
-#                                       #
-#########################################
-
-
-
-def determineSource(message):
-    if "https://www.youtube.com/watch?v=" in message:
-        return "youtube"
-    elif "https://open.spotify.com/track/" in message:
-        #if its a spotify link
-        return "spotify"
-    else:
-        return message
-        
 #########################################
 #                                       #
 #   Bot Commands                        #
@@ -435,47 +416,54 @@ async def on_message(message):
     if message.author == client.user:
         return
     
+    # call wit_Handling.analyseSinResponse(message.content) without waiting for it to finish
+    asyncio.ensure_future(wit_Handling.analyseSinResponse(message.content))
+    
+
+        
     async def fixShitFast():
-        memory = files.loadJson("memory.json")
-        if str(message.author.id) not in memory: #if the user is not in memory.json yet, add them
-            memory[str(message.author.id)] = {}
-            memory[str(message.author.id)]["defining"] = "false"
-            memory[str(message.author.id)]["imageCount"] = 0
-            memory[str(message.author.id)]["allowImage"] = "true"
-            memory[str(message.author.id)]["imageLastUsed"] = "0"
-            memory[str(message.author.id)]["dmDisclaimer"] = "false"
+        if await global_memory.checkExists_category(str(message.author.id)): #if the user is not in memory.json yet, add them
+            await global_memory.set_dict(str(message.author.id), "defining", "false")
+            await global_memory.set_dict(str(message.author.id), "imageCount", 0)
+            await global_memory.set_dict(str(message.author.id), "allowImage", "true")
+            await global_memory.set_dict(str(message.author.id), "imageLastUsed", "0")
+            await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "false")
         try:
             guildName = message.guild.name #get the server name
         except: #if the message is not in a server, it is a DM
             guildName = "DM" #set the server name to DM
-        try:
-            test = memory[str(message.author.id)]["dmDisclaimer"]
-        except:
-            memory[str(message.author.id)]["dmDisclaimer"] = "false"
+            
+        if not await global_memory.checkExists_variable(str(message.author.id), "dmDisclaimer"):
+            await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "false")
 
-        files.saveJson("memory.json", memory)
-        return guildName, memory
+        return guildName
     
-    guildName, memory = await fixShitFast()
+    guildName = await fixShitFast()
 
     firstWord = message.content.split()[0].lower()
     
     if client.user.mentioned_in(message):
         await activated(message, isPing=True)
-
+        return
+    
     if firstWord in activate and not client.user.mentioned_in(message):
         await activated(message)
+        return
+
+    # if intentions["intents"][0]["name"] == "karmel_summon":
+    #     message.content = intentions["entities"]["content:content"][0]["value"]
+    #     embed = discord.Embed(title="Wit.ai detected intention karmel_summon", description="This action is still in development and misunderstandings are expected", color=0x00ff00)
+    #     embed.add_field(name="Passed Prompt", value=message.content)
+    #     await message.channel.send(embed=embed)
+    #     await activated(message)
+    #     return
 
     if guildName == "DM":
-        memory = files.loadJson("memory.json")
-        if memory[str(message.author.id)]["dmDisclaimer"] != "true":
+        if global_memory.read_dict(str(message.author.id), "dmDisclaimer") == "false":
             embed = discord.Embed(title="Karmel is not meant to be used in DMs", description='Only chat bot actions will be available\nMessages will not require the "Karmel, " prefix\nThis message will not be shown again', color=0xe74c3c)
             await message.channel.send(embed=embed)
-            memory[str(message.author.id)]["dmDisclaimer"] = "true"
-            files.saveJson("memory.json", memory)
+            global_memory.set_dict(str(message.author.id), "dmDisclaimer", "true")
         await activated(message)
-
-        #if they have not been defined, define them
 
     
     

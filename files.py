@@ -5,11 +5,37 @@ class async_dictionary():
         self.file = file
         self.dictionary = loadJson(file)
 
-    async def OTF_set(self, category: str, variable: str, value):
+    async def set_dict(self, category: str, variable: str, value):
+        if category not in self.dictionary:
+            self.dictionary[category] = {}
         self.dictionary[category][variable] = value
 
-    async def OTF_get(self, category: str, variable: str):
+    async def read_dict(self, category: str, variable: str):
         return self.dictionary[category][variable]
+
+    async def checkExists_category(self, category: str):
+        if category in self.dictionary:
+            return True
+        else:
+            return False
+
+    async def checkExists_variable(self, category: str, variable: str):
+        if variable in self.dictionary[category]:
+            return True
+        else:
+            return False
+
+    async def save(self):
+        saveJson(self.file, self.dictionary)
+
+    async def reload(self):
+        self.dictionary = loadJson(self.file)
+        # for when im to lazy to find and replace the parts that just read directly from the file and save to it
+
+    async def add_dict(self, category: str, variable: str, value):
+        if category not in self.dictionary:
+            self.dictionary[category] = {}
+        self.dictionary[category][variable] += value
         
 
 

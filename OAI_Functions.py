@@ -2,6 +2,7 @@ import traceback
 import openai
 import discord
 import files
+from files import async_dictionary
 from variables import *
 from discord import app_commands
 import datetime
@@ -10,6 +11,12 @@ import interactions
 from misc_functions import asyncErr
 
 openai.api_key = files.loadJson("tokens.json")["openai"]
+
+async def memoryHandler(authorId, newMessage, newResponse):
+    await global_memory.set_dict(authorId, "response-1", await global_memory.read_dict(authorId, "response"))
+    await global_memory.set_dict(authorId, "response", newResponse)
+    await global_memory.set_dict(authorId, "message-1", await global_memory.read_dict(authorId, "message"))
+    await global_memory.set_dict(authorId, "message", newMessage)
 
 ############################################################################################################################################################################
 # Function that will send a prompt to GPT-3 and return the response (Call and Response) ##
@@ -28,7 +35,7 @@ async def CAR(prompt, maxTokens=300, engine="text-davinci-003", temperature=0.9)
     except:
         isRateLimit = True
     # return the response
-    return response, isRateLimit
+    return response.choices[0].text, response, isRateLimit
 
 ############################################################################################################################################################################
 # Function to request information from Codex instead of GPT-3 ##
@@ -93,8 +100,8 @@ async def isBad(message):
     return True
 
 ############################################################################################################################################################################
-# Function that sends a prompt to DALL-E2 and return the image ##
-#################################################################
+# Function that sends a prompt to DALL-E 2 and returns the image ##
+###################################################################
 
 async def draw(message):
 
@@ -145,10 +152,8 @@ async def gptWithoutMemory(message):
 
 async def gptWithMemory(message):
 
-    memory = files.loadJson("memory.json")
-
     # prevents the bot to responding to things while another thread recieves input for a command
-    if memory[str(message.author.id)]["defining"] == "true":
+    if await global_memory.read_dict(str(message.author.id), "defining") == "true":
             return
 
     # remove the any form of the activation word from the message
@@ -172,39 +177,40 @@ async def gptWithMemory(message):
     try:
         
         try:
-            test = memory[message.author.id]["message"]
+            test = await global_memory.read_dict(str(message.author.id), "message")
         except:
-            memory[str(message.author.id)]["message"] = "NONE"
-            memory[str(message.author.id)]["response"] = "NONE"
+            await global_memory.set_dict(str(message.author.id), "message", "NONE")
+            await global_memory.set_dict(str(message.author.id), "response", "NONE")
+        
+        try:
+            test = await global_memory.read_dict(str(message.author.id), "message-1")
+        except:
+            await global_memory.set_dict(str(message.author.id), "message-1", "NONE")
+            await global_memory.set_dict(str(message.author.id), "response-1", "NONE")
 
         author = str(message.author.id)
-        aName = memory[author]["name"]
-        aGender = memory[author]["gender"]
-        frstSeen = memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + " UTC"
+        aName = await global_memory.read_dict(author, "name")
+        aGender = await global_memory.read_dict(author, "gender")
+        frstSeen = await global_memory.read_dict(author, "definitionDOW") + " " + await global_memory.read_dict(author, "definitiondate") + " UTC"
+        clnt = client.user.name+" (Female): "
+        usr = aName+" ("+aGender+"): "
 
         # get the current time in UTC and convert it to a human readable format
         now = datetime.datetime.utcnow()
-        now = now.strftime("%Y-%m-%d %H:%M:%S")
+        now = now.strftime("%A %Y-%m-%d %H:%M:%S")
         now = str(now) + " UTC"
 
         async with message.channel.typing():
             
-            prompt = "{username:" + aName + ", gender: " + aGender + ", first seen: " + memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + ' UTC}\nIt is currently '+ now + ', Server name: ' + guildName + '\n' + memory[author]["name"] + " (" + memory[author]["gender"] + "): " + memory[author]["message"] + "\n"+client.user.name+" (Female): " + memory[author]["response"] + "\n"+ memory[author]["name"] + " (" + memory[author]["gender"] + "): " + messageContent + "\n"+client.user.name+" (Female): "
-            memory[author]["message"] = messageContent
+            prompt = "{username:"+aName+", gender: "+aGender+", first seen: "+frstSeen+'}\nIt is currently '+now+', Server name: '+guildName+'\n'+usr+ await global_memory.read_dict(author, "message-1")+'\n'+clnt+await global_memory.read_dict(author, "response-1")+'\n'+usr+await global_memory.read_dict(author, "message")+"\n"+clnt+await global_memory.read_dict(author, "response")+"\n"+aName+" ("+aGender+"): "+messageContent+"\n"+client.user.name+" (Female): "
 
             print(prompt)
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
-                n=1,
-                max_tokens=200
-            )
-            print(response.choices[0].text)
-            memory[author]["response"] = response.choices[0].text
+            response, fullResponse, rl = await CAR(prompt)
+            print(response)
+            await memoryHandler(author, messageContent, response)
+
         # reply to the user with the response
-        await message.channel.send(response.choices[0].text, reference=message)
-        #save memory to file with json
-        files.saveJson("memory.json", memory)
+        await message.channel.send(response, reference=message)
     except:
         await asyncErr(message, traceback.format_exc())
         await gptWithoutMemory(message)
