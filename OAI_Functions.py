@@ -12,6 +12,12 @@ from misc_functions import asyncErr
 
 openai.api_key = files.loadJson("tokens.json")["openai"]
 
+async def memoryHandler(authorId, newMessage, newResponse):
+    await global_memory.set_dict(authorId, "response-1", await global_memory.read_dict(authorId, "response"))
+    await global_memory.set_dict(authorId, "response", newResponse)
+    await global_memory.set_dict(authorId, "message-1", await global_memory.read_dict(authorId, "message"))
+    await global_memory.set_dict(authorId, "message", newMessage)
+
 ############################################################################################################################################################################
 # Function that will send a prompt to GPT-3 and return the response (Call and Response) ##
 ###########################################################################################
@@ -191,7 +197,7 @@ async def gptWithMemory(message):
 
         # get the current time in UTC and convert it to a human readable format
         now = datetime.datetime.utcnow()
-        now = now.strftime("%Y-%m-%d %H:%M:%S")
+        now = now.strftime("%A %Y-%m-%d %H:%M:%S")
         now = str(now) + " UTC"
 
         async with message.channel.typing():
@@ -201,11 +207,7 @@ async def gptWithMemory(message):
             print(prompt)
             response, fullResponse, rl = await CAR(prompt)
             print(response)
-            await global_memory.set_dict(author, "response-1", await global_memory.read_dict(author, "response"))
-            await global_memory.set_dict(author, "response", response)
-            await global_memory.set_dict(author, "message-1", await global_memory.read_dict(author, "message"))
-            await global_memory.set_dict(author, "message", messageContent)
-            await global_memory.save()
+            await memoryHandler(author, messageContent, response)
 
         # reply to the user with the response
         await message.channel.send(response, reference=message)

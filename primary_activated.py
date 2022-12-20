@@ -295,6 +295,7 @@ async def activated(message, isPing=False):
             global_memory.add_dict(authorId, "imageCount", 1)
             global_memory.set_dict(authorId, "defining" , "false")
             global_memory.set_dict(authorId, "imageLastUsed", timeDay)
+            memoryHandler(authorId, 'COMMAND.DRAW_PICTURE "', 'PROMPT: "'+response+'"')
             skipCheck = False
         return
 
