@@ -6,6 +6,7 @@ import os
 # open config.txt
 class config():
     def __init__(self, file):
+        self.file = file
         # if the file does not exist, create it
         if not os.path.isfile(file):
             with open(file, "w") as config:
@@ -13,7 +14,6 @@ class config():
                 with open("default_config_DO_NOT_EDIT.config", "r") as default_config:
                     default_config = default_config.read()
                 config.write(default_config)
-
         # open the file                
         with open(file, "r") as config:
             config = config.read()
@@ -22,8 +22,22 @@ class config():
         # convert the list into a dictionary
         config = dict([x.split(": ") for x in config])
 
+    def __write(self):
+        # convert dictionary into a list with each item being a different line
+        config = [key + ": " + value for key, value in config.items()]
+        # convert the list into a string
+        config = "\n".join(config)
+        # write the new config to config.txt
+        with open(self.file, "w") as config:
+            config.write(config)
+
     def get(self, key):
         return config[key]
+
+    def set(self, key, value):
+        config[key] = value
+        # write the new config to config.txt
+        self.__write()
 
 class async_dictionary():
     def __init__(self, file):

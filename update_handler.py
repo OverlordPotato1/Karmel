@@ -2,8 +2,10 @@ import git
 import time
 import os
 import sys
+import variables
+import misc_functions as misc
+import datetime
 
-branch = "preview"
 time.sleep(0.25)
 # get the parent of the current directory
 parentDir = os.path.dirname(os.getcwd())
@@ -14,8 +16,14 @@ currentDir = os.getcwd()
 repo = git.Repo(currentDir)
 # set the repo to pull from
 repo.git.pull()
+misc.logWarn("Pulled latest version from GitHub.")
+misc.logWarn("Killing process and running bot.py")
+now = datetime.datetime.now()
+# format the time to contain the date and time
+time = now.strftime("%d/%m/%Y %H:%M")
+variables.config.set("lastUpdate (DO NOT EDIT)", time)
 # wait 1 second
-time.sleep(0.25)
+time.sleep(1)
 
 os.chdir(currentDir)
 # stop the current process and execute bot.py

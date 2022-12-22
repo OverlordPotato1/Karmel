@@ -356,8 +356,11 @@ async def on_ready():
     # start updater without blocking
     asyncio.create_task(updater())
     # delete log
-    if os.path.exists("log.txt"):
-        os.remove("log.txt")
+    now = datetime.datetime.utcnow()
+    now = now.strftime("%d/%m/%Y %H:%M")
+    if config.get("lastUpdate (DO NOT EDIT)") != now:
+        if os.path.exists("log.txt"):
+            os.remove("log.txt")
     # load the commands from commands.py
     
     print("Connected!")

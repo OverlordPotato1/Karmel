@@ -2,6 +2,7 @@ import discord
 import traceback
 
 def logError(error):
+    print(error)
     with open("log.txt", "a") as log:
         log.write("\n")
         log.write(error)
@@ -12,6 +13,7 @@ def logError(error):
         log.write("\n")
 
 def logWarn(warning):
+    print(warning)
     with open("log.txt", "a") as log:
         log.write(warning)
         log.write("\n")

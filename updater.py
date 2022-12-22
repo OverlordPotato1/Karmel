@@ -68,6 +68,9 @@ async def updateChecker():
 
     # if the current version is older than the latest version
     if currentVersion[0] < latestVersion[0]:
+        misc_functions.logWarn("New version available")
+        misc_functions.logError("Updating...")
+
         # launch a new terminal and run update_handler.py
         os.execv(sys.executable, ['python update_handler.py'])
 
