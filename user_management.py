@@ -9,16 +9,14 @@ async def defineMe(message):
     def check(m):
         return m.author.id == message.author.id
     # read memory from file "memory.json" using json
-    memory = files.loadJson("memory.json")
     author = str(message.author.id)
     
 
-    memory[author]["name"] = ""
-    memory[author]["gender"] = ""
-    memory[author]["definitiondate"] = ""
-    memory[author]["definitionDOW"] = ""
-    memory[author]["defining"] = "true"
-    files.saveJson("memory.json", memory)
+    await global_memory.set_dict(author,"name","")
+    await global_memory.set_dict(author,"gender","")
+    await global_memory.set_dict(author,"definitiondate","")
+    await global_memory.set_dict(author,"definitionDOW","")
+    await global_memory.set_dict(author,"defining","true")
 
 
     embed = discord.Embed(title="What is your name?", description="", color=0x00ff00)
@@ -45,16 +43,13 @@ async def defineMe(message):
 
     async with message.channel.typing():
         await asyncio.sleep(1)
-        memory = files.loadJson("memory.json")
     
-        memory[author]["name"] = name
-        memory[author]["gender"] = msg.content
+        await global_memory.set_dict(author,"name",name)
+        await global_memory.set_dict(author,"gender",msg.content)
         # get the current date and time in UTC
-        memory[author]["definitiondate"] = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-        memory[author]["definitionDOW"] = datetime.datetime.utcnow().strftime("%A")
-        memory[author]["defining"] = "false"
-
-        files.saveJson("memory.json", memory)
+        await global_memory.set_dict(author,"definitiondate",datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+        await global_memory.set_dict(author,"definitionDOW",datetime.datetime.utcnow().strftime("%A"))
+        await global_memory.set_dict(author,"defining","false")
 
 async def defaultUser(id):
     # set the default values for a user

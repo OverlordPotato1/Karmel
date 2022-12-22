@@ -10,19 +10,20 @@ import wit_Handling
 
 async def activated(message, isPing=False):
 
+    # print(await global_memory.read_dict(str(message.author.id)))
+
+    if not await global_memory.checkExists_variable(message.author.id, "defining"):
+        await global_memory.set_dict(str(message.author.id), "defining", "false")
+    elif await global_memory.read_dict(str(message.author.id), "defining") == "true":
+        return
+
     timeUTC = datetime.datetime.utcnow()
     timeDay = timeUTC.strftime("%Y-%m-%d")
     timeSubDay = timeUTC.strftime("%H:%M:%S")
     authorId = str(message.author.id)
 
     if not await global_memory.checkExists_category(authorId):
-        await global_memory.set_dict(authorId, "name", "")
-        await global_memory.set_dict(authorId, "gender", "")
-        await global_memory.set_dict(authorId, "defining", "false")
-        await global_memory.set_dict(authorId, "imageCount", 0)
-        await global_memory.set_dict(authorId, "allowImage", "true")
-        await global_memory.set_dict(authorId, "imageLastUsed", "0")
-        await global_memory.set_dict(authorId, "dmDisclaimer", "false")
+        await defaultUser(authorId)
 
     def sameAuthor(m):
         return m.author.id == message.author.id
@@ -46,12 +47,13 @@ async def activated(message, isPing=False):
 
     # response = await wit_Handling.CAR(message)
 
-    # if newMessage == "define me":
+    if newMessage == "define me":
 
-    #     await defineMe(message)
-    #     # tell the user that they have been defined
-    #     await message.channel.send("You are now in memory")
-    #     return
+        await defineMe(message)
+        # tell the user that they have been defined
+        await message.channel.send("You are now in memory")
+        print("global_memory: ", await global_memory.read_dict(category = authorId))
+        return
 
     #################################################
     # POTENTIAL SOURCE OF CRASH. MAY NEED REWORKING #
@@ -64,23 +66,23 @@ async def activated(message, isPing=False):
     # / / / / / / / / / / / / / / / / / / / / / / / #
     #################################################
 
-    # if newMessage == "who am i":
-    #     # read memory from file "memory.json" using json
-    #     memory = files.loadJson("memory.json")
-    #     author = str(message.author.id)
-    #     # if the user is in the dictionary memory, tell them their name
-    #     if author in memory:
-    #         await message.channel.send("{'<@" + str(author) + ">': " + str(memory[author]) + "}")
-    #     else:
-    #         await message.channel.send("I don't know, do you wish to be defined?")
-    #         # wait for a response
-    #         response = await client.wait_for("message", check=sameAuthor)
-    #         # if the response is yes, define them
-    #         if response.content.lower() == "yes":
-    #             await defineMe(message)
-    #     return
+    if newMessage == "who am i":
+        # read memory from file "memory.json" using json
+        memory = await global_memory.read_dict(category = authorId)
+        # if the user is in memory
+        if memory != None:
+            # tell the user who they are
+            await message.channel.send(memory)
+        else:
+            # tell the user that they are not in memory
+            await message.channel.send("You are not in memory")
+
+        return
 
     if newMessage == "sync":
+        # yea i have no fucking clue how this works because copilot wrote it and it didn't need debugging so i just left it and somehow it works but i don't know how so im just gonna leave it here and copilot wrote this comment as well so i guess he knows how it works
+        # im not letting copilot write more comments because it gave itself female and male pronouns in the same sentence pick a fucking side
+
         # ensure the user has the id 441688723344719882
         if message.author.id == 441688723344719882:
             # read memory from file "memory.json" using json

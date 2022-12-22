@@ -285,27 +285,20 @@ async def drawImage(ctx, prompt: str):
         embed = discord.Embed(title="Moderation", description="Your prompt was rejected", color=0xe74c3c)
         await ctx.response.send_message(embed=embed)
 
-    memory = files.loadJson("memory.json")
-    try:
-        test = memory[str(ctx.user.id)]["allowImage"]
-    except:
-        memory[str(ctx.user.id)]["allowImage"] = "true"
-        memory[str(ctx.user.id)]["imageCount"] = 0
-        memory[str(ctx.user.id)]["imageLastUsed"] = "Never"
-        files.saveJson("memory.json", memory)
+    if not await global_memory.checkExists_variable(ctx.user.id, "allowImage"):
+        await global_memory.set_dict(str(ctx.user.id),"allowImage","true")
+        await global_memory.set_dict(str(ctx.user.id),"imageCount",0)
+        await global_memory.set_dict(str(ctx.user.id),"imageLastUsed","Never")
     # check if the user has the allowImage status
-    memory = files.loadJson("memory.json")
     now = datetime.datetime.utcnow()
     now = now.strftime("%Y-%m-%d")
 
-    if memory[str(ctx.user.id)]["imageLastUsed"] != now:
-        memory[str(ctx.user.id)]["imageCount"] = 0
-        memory[str(ctx.user.id)]["allowImage"] = "true"
-
-        files.saveJson("memory.json", memory)
+    if await global_memory.read_dict(str(ctx.user.id),"imageLastUsed") != now:
+        await global_memory.set_dict(str(ctx.user.id),"imageCount",0)
+        await global_memory.set_dict(str(ctx.user.id),"allowImage","true")
         skipCheck = True
 
-    if memory[str(ctx.user.id)]["allowImage"] == "false" and skipCheck == False:
+    if await global_memory.read_dict(str(ctx.user.id),"allowImage") == "false" and skipCheck == False:
         embed = discord.Embed(title="Image Limit Reached", description="You have reached the image limit today", color=0xff0000)
         embed.set_footer(text="You can use images again tomorrow")
         await ctx.response.send_message(embed=embed)
@@ -314,8 +307,8 @@ async def drawImage(ctx, prompt: str):
     
     
     
-    if memory[str(ctx.user.id)]["imageCount"] >= 25 and skipCheck == False:
-        memory[str(ctx.user.id)]["allowImage"] = "false"
+    if await global_memory.read_dict(str(ctx.user.id),"imageCount") >= 25 and skipCheck == False:
+        await global_memory.set_dict(str(ctx.user.id),"allowImage","false")
         embed = discord.Embed(title="Image Limit Reached", description="You have reached the image limit today", color=0xff0000)
         embed.set_footer(text="You can use images again tomorrow")
         await ctx.response.send_message(embed=embed)
@@ -346,12 +339,10 @@ async def drawImage(ctx, prompt: str):
         await msg.edit(embed=embed)
         # send a response that all users can see
         await ctx.response.send_message(file=discord.File(image))
-        memory = files.loadJson("memory.json")
-        memory[str(ctx.user.id)]["imageCount"] += 1
-        memory[str(ctx.user.id)]["defining"] = "false"
-        memory[str(ctx.user.id)]["imageLastUsed"] = now
+        await global_memory.set_dict(str(ctx.user.id),"imageCount",1)
+        await global_memory.set_dict(str(ctx.user.id),"defining","false")
+        await global_memory.set_dict(str(ctx.user.id),"imageLastUsed",now)
         skipCheck = False
-        files.saveJson("memory.json", memory)
     return
 #########################################
 #                                       #
@@ -359,10 +350,11 @@ async def drawImage(ctx, prompt: str):
 #                                       #
 #########################################
 
-
-
 @client.event
 async def on_ready():
+    # delete log
+    if os.path.exists("log.txt"):
+        os.remove("log.txt")
     # load the commands from commands.py
     
     print("Connected!")
@@ -413,21 +405,38 @@ async def on_member_remove(member):
 
 @client.event
 async def on_message(message):
+    if not os.path.exists("memory.json"):
+        f = open("memory.json", "w")
+        f.write("{}")
+        f.close()
     if message.author == client.user:
         return
+
+    now = datetime.datetime.now()
+    now = now.strftime("%Y-%m-%d %H:%M:%S")
+    nowDOW = datetime.datetime.now()
+    nowDOW = nowDOW.strftime("%A")
     
     # call wit_Handling.analyseSinResponse(message.content) without waiting for it to finish
-    asyncio.ensure_future(wit_Handling.analyseSinResponse(message.content))
+    # asyncio.ensure_future(wit_Handling.analyseSinResponse(message.content))
+
+    intentions = await wit_Handling.CAR(message)
+    # print(intentions)
     
 
         
     async def fixShitFast():
-        if await global_memory.checkExists_category(str(message.author.id)): #if the user is not in memory.json yet, add them
+        if not await global_memory.checkExists_category(str(message.author.id)): #if the user is not in memory.json yet, add them
             await global_memory.set_dict(str(message.author.id), "defining", "false")
             await global_memory.set_dict(str(message.author.id), "imageCount", 0)
             await global_memory.set_dict(str(message.author.id), "allowImage", "true")
             await global_memory.set_dict(str(message.author.id), "imageLastUsed", "0")
             await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "false")
+            await global_memory.set_dict(message.author.id, "name", message.author.name)
+            await global_memory.set_dict(message.author.id, "gender", "unknown")
+            await global_memory.set_dict(message.author.id, "definitionDOW", nowDOW)
+            await global_memory.set_dict(message.author.id, "definitiondate", str(now))
+
         try:
             guildName = message.guild.name #get the server name
         except: #if the message is not in a server, it is a DM
@@ -450,19 +459,22 @@ async def on_message(message):
         await activated(message)
         return
 
-    # if intentions["intents"][0]["name"] == "karmel_summon":
-    #     message.content = intentions["entities"]["content:content"][0]["value"]
-    #     embed = discord.Embed(title="Wit.ai detected intention karmel_summon", description="This action is still in development and misunderstandings are expected", color=0x00ff00)
-    #     embed.add_field(name="Passed Prompt", value=message.content)
-    #     await message.channel.send(embed=embed)
-    #     await activated(message)
-    #     return
+    try:
+        if intentions["intents"][0]["name"] == "karmel_summon":
+            message.content = intentions["entities"]["content:content"][0]["value"]
+            embed = discord.Embed(title="Wit.ai detected intention karmel_summon", description="This action is still in development and misunderstandings are expected", color=0x00ff00)
+            embed.add_field(name="Passed Prompt", value=message.content)
+            await message.channel.send(embed=embed)
+            await activated(message)
+            return
+    except:
+        pass
 
     if guildName == "DM":
-        if global_memory.read_dict(str(message.author.id), "dmDisclaimer") == "false":
+        if await global_memory.read_dict(str(message.author.id), "dmDisclaimer") == "false":
             embed = discord.Embed(title="Karmel is not meant to be used in DMs", description='Only chat bot actions will be available\nMessages will not require the "Karmel, " prefix\nThis message will not be shown again', color=0xe74c3c)
             await message.channel.send(embed=embed)
-            global_memory.set_dict(str(message.author.id), "dmDisclaimer", "true")
+            await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "true")
         await activated(message)
 
     

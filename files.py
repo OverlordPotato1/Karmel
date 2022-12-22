@@ -1,4 +1,6 @@
+import inspect
 import json
+from misc_functions import *
 
 class async_dictionary():
     def __init__(self, file):
@@ -6,27 +8,75 @@ class async_dictionary():
         self.dictionary = loadJson(file)
 
     async def set_dict(self, category: str, variable: str, value):
+        if type(category) != str:
+            category = str(category)
+        if type(variable) != str:
+            variable = str(variable)
         if category not in self.dictionary:
+            logWarn("Category ("+category+") not found in dictionary. Creating category.")
             self.dictionary[category] = {}
         self.dictionary[category][variable] = value
 
-    async def read_dict(self, category: str, variable: str):
-        return self.dictionary[category][variable]
+    async def read_dict(self, category = None, variable = None, defOnFail = None, convBinary = False):
+        if category == None:
+            return self.dictionary
+        if variable == None:
+            return self.dictionary[category]
+        # raise exception if category or variable are not a string
+        line = inspect.currentframe().f_back.f_lineno
+        prevFile = inspect.currentframe().f_back.f_code.co_filename
+        if type(category) != str:
+            category = str(category)
+        if type(variable) != str:
+            variable = str(variable)
+        try:
+            value = self.dictionary[category][variable]
+        except:
+            if defOnFail != None:
+                self.dictionary[category][variable] = defOnFail
+                logWarn("An unknown error occured during read of variable ("+variable+") in category ("+category+"). A fallback value was provided, program continued.")
+                # raise KeyError("An unknown error occured during read of variable ("+variable+") in category ("+category+"). A fallback value was provided, program will continue.")
+            else:
+                # logError("read_dict failed to find variable ("+variable+") in category ("+category+") and no fallback definition was provided. Line "+str(line)+" in file "+prevFile+".")
+                raise KeyError("read_dict failed to find variable ("+variable+") in category ("+category+") and no fallback definition was provided. Line "+str(line)+" in file "+prevFile+".")
+        trueVals = ["true", "t", "yes", "y", "1", "yes", "on", "enable", "enabled", "active", "activated"]
+        falseVals = ["false", "f", "no", "n", "0", "no", "off", "disable", "disabled", "inactive", "deactivated"]
+        if convBinary:
+            if value.lower() in trueVals:
+                return True
+            elif value.lower() in falseVals:
+                return False
+            else:
+                raise TypeError("read_dict failed to convert binary value ("+value+") to boolean. Recieved value is not a known valid binary value: "+value)
+        else:
+            return value
+
 
     async def checkExists_category(self, category: str):
-        if category in self.dictionary:
+        if type(category) != str:
+            category = str(category)
+        try:
+            test = self.dictionary[category]
             return True
-        else:
+        except:
             return False
 
+
     async def checkExists_variable(self, category: str, variable: str):
-        if variable in self.dictionary[category]:
+        if type(category) != str:
+            category = str(category)
+        if type(variable) != str:
+            variable = str(variable)
+        try:
+            test = self.dictionary[category][variable]
             return True
-        else:
+        except:
             return False
+
 
     async def save(self):
         saveJson(self.file, self.dictionary)
+
 
     async def reload(self):
         self.dictionary = loadJson(self.file)
@@ -50,6 +100,7 @@ def loadJson(filename):
     except:
         print("Error reading from " + filename)
         return {}
+
 
 def saveJson(filename, data):
     try:

@@ -153,7 +153,7 @@ async def gptWithoutMemory(message):
 async def gptWithMemory(message):
 
     # prevents the bot to responding to things while another thread recieves input for a command
-    if await global_memory.read_dict(str(message.author.id), "defining") == "true":
+    if await global_memory.read_dict(str(message.author.id), "defining", convBinary=True):
             return
 
     # remove the any form of the activation word from the message
