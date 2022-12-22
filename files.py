@@ -8,7 +8,7 @@ class config():
     def __init__(self, file):
         self.file = file
         # if the file does not exist, create it
-        if not os.path.isfile(file):
+        if not os.path.isfile(file) or os.stat(file).st_size == 0:
             with open(file, "w") as config:
                 # write the default config from default_config_DO_NOT_EDIT.config
                 with open("default_config_DO_NOT_EDIT.config", "r") as default_config:
@@ -28,8 +28,8 @@ class config():
         # convert the list into a string
         config = "\n".join(config)
         # write the new config to config.txt
-        with open(self.file, "w") as config:
-            config.write(config)
+        with open(self.file, "w") as configfile:
+            configfile.write(config)
 
     def get(self, key):
         return self.config[key]

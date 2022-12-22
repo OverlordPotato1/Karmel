@@ -91,3 +91,231 @@ Preview version: 6
 Latest version is a preview version.
 Preview version: 6
 No update
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/master/version.txt
+On preview branch. Bugs will ocur.
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/master/version.txt
+On preview branch. Bugs will ocur.
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.25, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+New version available
+
+Updating...
+NoneType: None
+
+------------------------------------------------------------

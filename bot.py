@@ -358,7 +358,7 @@ async def on_ready():
     # delete log
     now = datetime.datetime.utcnow()
     now = now.strftime("%d/%m/%Y %H:%M")
-    if config.get("lastUpdate (DO NOT EDIT)") != now:
+    if config.get("last_update (DO NOT EDIT)") != now:
         if os.path.exists("log.txt"):
             os.remove("log.txt")
     # load the commands from commands.py

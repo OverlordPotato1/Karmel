@@ -17,10 +17,8 @@ import variables
 
 
 
-async def updateChecker():
+async def updateChecker(interval):
     branch = variables.config.get("branch")
-    # remove the "" around the branch
-    branch = branch[1:-1]
     # get the parent of the current directory
     parentDir = os.path.dirname(os.getcwd())
     # get the current directory
@@ -31,7 +29,7 @@ async def updateChecker():
             currentVersion = version.read()
     except:
         misc_functions.logWarn("Failed to get version.txt from local directory.  Retrying in 4 minutes.")
-        time.sleep(60*4)
+        time.sleep(interval)
         asyncio.run(updateChecker())
 
     # get the latest version
@@ -40,7 +38,7 @@ async def updateChecker():
         latestVersion = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch+"/version.txt").text
     except:
         misc_functions.logWarn("Failed to get version.txt from GitHub.  Retrying in 4 minutes.")
-        time.sleep(60*4)
+        time.sleep(interval)
         asyncio.run(updateChecker())
 
     # split the version numbers into a list
@@ -133,4 +131,4 @@ async def updateChecker():
     #     time.sleep(60*4)
     #     asyncio.run(updateChecker())
 
-asyncio.run(updateChecker())
+asyncio.run(updateChecker(4*60))

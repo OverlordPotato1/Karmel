@@ -14,17 +14,21 @@ currentDir = os.getcwd()
 # using gitpython set the branch from branch and pull the latest version into the parent directory
 # os.chdir(parentDir)
 repo = git.Repo(currentDir)
-# set the repo to pull from
-repo.git.pull()
+# set the branch to pull from
+try:
+    branch = variables.config.get("branch")
+    repo.git.checkout(branch)
+    repo.git.pull()
+except:
+    raise
 misc.logWarn("Pulled latest version from GitHub.")
 misc.logWarn("Killing process and running bot.py")
 now = datetime.datetime.now()
 # format the time to contain the date and time
-time = now.strftime("%d/%m/%Y %H:%M")
-variables.config.set("lastUpdate (DO NOT EDIT)", time)
+currtime = now.strftime("%d/%m/%Y %H:%M")
+variables.config.set("last_update (DO NOT EDIT)", currtime)
 # wait 1 second
-time.sleep(1)
+time.sleep(2)
 
-os.chdir(currentDir)
 # stop the current process and execute bot.py
 os.execv(sys.executable, ['python bot.py'])
