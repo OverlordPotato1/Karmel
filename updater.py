@@ -12,6 +12,7 @@ import sys
 import time
 import asyncio
 import misc_functions
+import git
 
 branch = "preview"
 
@@ -62,78 +63,62 @@ async def updateChecker():
         misc_functions.logWarn("Latest version is a preview version.")
         misc_functions.logWarn("Preview version: "+str(latestVersion[2]))
     
+    # repo is at https://github.com/OverlordPotato1/Karmel.git
 
     # if the current version is older than the latest version
     if currentVersion[0] < latestVersion[0]:
-        # download the new version into the parent folder
-        r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch, stream=True)
-        # download zip in parentDir
-        with open(parentDir+"/Karmel.zip", "wb") as f:
-            shutil.copyfileobj(r.raw, f)    
-        # unzip the new version into the parent folder
-        with zipfile.ZipFile(parentDir+"/Karmel.zip", "r") as zip_ref:
-            # replace the old files in the current directory with the new files
-            zip_ref.extractall(currentDir)
-        # delete the zip file
-        os.remove(parentDir+"/Karmel.zip")
-        # delete the old version
-        os.remove("version.txt")    
-        # rename the new version
-        os.rename(currentDir+"/Karmel-master/version.txt", "version.txt")
-        # delete the old files
-        shutil.rmtree(currentDir+"/Karmel-master")
-        # restart the bot
-        os.execv(sys.executable, ['python'] + sys.argv)
+        #using gitpython download the new version into the parent folder
+        repo = git.Repo.clone_from("https://github.com/OverlordPotato1/Karmel.git", parentDir+"/Karmel")
 
-    elif currIsPreview and not downloadIsPreview:
-        # download the new version into the parent folder
-        r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch, stream=True)
-        # download zip in parentDir
-        with open(parentDir+"/Karmel.zip", "wb") as f:
-            shutil.copyfileobj(r.raw, f)    
-        # unzip the new version into the parent folder
-        with zipfile.ZipFile(parentDir+"/Karmel.zip", "r") as zip_ref:
-            # replace the old files in the current directory with the new files
-            zip_ref.extractall(currentDir)
-        # delete the zip file
-        os.remove(parentDir+"/Karmel.zip")
-        # delete the old version
-        os.remove("version.txt")    
-        # rename the new version
-        os.rename(currentDir+"/Karmel-master/version.txt", "version.txt")
-        # delete the old files
-        shutil.rmtree(currentDir+"/Karmel-master")
-        # restart the bot
-        os.execv(sys.executable, ['python'] + sys.argv)
-    if currIsPreview and downloadIsPreview:
-        # compare the preview versions
-        if currentVersion[2] < latestVersion[2]:
-            # download the new version into the parent folder
-            r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch, stream=True)
-            # download zip in parentDir
-            with open(parentDir+"/Karmel.zip", "wb") as f:
-                shutil.copyfileobj(r.raw, f)    
-            # unzip the new version into the parent folder
-            with zipfile.ZipFile(parentDir+"/Karmel.zip", "r") as zip_ref:
-                # replace the old files in the current directory with the new files
-                zip_ref.extractall(currentDir)
-            # delete the zip file
-            os.remove(parentDir+"/Karmel.zip")
-            # delete the old version
-            os.remove("version.txt")    
-            # rename the new version
-            os.rename(currentDir+"/Karmel-master/version.txt", "version.txt")
-            # delete the old files
-            shutil.rmtree(currentDir+"/Karmel-master")
-            # restart the bot
-            os.execv(sys.executable, ['python'] + sys.argv)
-        else:
-            print("No update available")
-            time.sleep(60*4)
-            asyncio.run(updateChecker())
-    else:
-        print("No update available")
-        time.sleep(60*4)
-        asyncio.run(updateChecker())
+    # elif currIsPreview and not downloadIsPreview:
+    #     # download the new version into the parent folder
+    #     r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch, stream=True)
+    #     # download zip in parentDir
+    #     with open(parentDir+"/Karmel.zip", "wb") as f:
+    #         shutil.copyfileobj(r.raw, f)    
+    #     # unzip the new version into the parent folder
+    #     with zipfile.ZipFile(parentDir+"/Karmel.zip", "r") as zip_ref:
+    #         # replace the old files in the current directory with the new files
+    #         zip_ref.extractall(currentDir)
+    #     # delete the zip file
+    #     os.remove(parentDir+"/Karmel.zip")
+    #     # delete the old version
+    #     os.remove("version.txt")    
+    #     # rename the new version
+    #     os.rename(currentDir+"/Karmel-master/version.txt", "version.txt")
+    #     # delete the old files
+    #     shutil.rmtree(currentDir+"/Karmel-master")
+    #     # restart the bot
+    #     os.execv(sys.executable, ['python'] + sys.argv)
+    # if currIsPreview and downloadIsPreview:
+    #     # compare the preview versions
+    #     if currentVersion[2] < latestVersion[2]:
+    #         # download the new version into the parent folder
+    #         r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch, stream=True)
+    #         # download zip in parentDir
+    #         with open(parentDir+"/Karmel.zip", "wb") as f:
+    #             shutil.copyfileobj(r.raw, f)    
+    #         # unzip the new version into the parent folder
+    #         with zipfile.ZipFile(parentDir+"/Karmel.zip", "r") as zip_ref:
+    #             # replace the old files in the current directory with the new files
+    #             zip_ref.extractall(currentDir)
+    #         # delete the zip file
+    #         os.remove(parentDir+"/Karmel.zip")
+    #         # delete the old version
+    #         os.remove("version.txt")    
+    #         # rename the new version
+    #         os.rename(currentDir+"/Karmel-master/version.txt", "version.txt")
+    #         # delete the old files
+    #         shutil.rmtree(currentDir+"/Karmel-master")
+    #         # restart the bot
+    #         os.execv(sys.executable, ['python'] + sys.argv)
+    #     else:
+    #         print("No update available")
+    #         time.sleep(60*4)
+    #         asyncio.run(updateChecker())
+    # else:
+    #     print("No update available")
+    #     time.sleep(60*4)
+    #     asyncio.run(updateChecker())
 
 asyncio.run(updateChecker())
