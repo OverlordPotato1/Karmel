@@ -14,6 +14,7 @@ def logError(error):
 def logWarn(warning):
     with open("log.txt", "a") as log:
         log.write(warning)
+        log.write("\n")
 
 async def asyncErr(message, error):
     embed = discord.Embed(title="An error occurred", description="An error occurred while trying to run the command.  Please file a bug report on GitHub.")

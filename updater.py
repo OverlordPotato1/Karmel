@@ -15,7 +15,12 @@ import misc_functions
 
 branch = "preview"
 
+
 async def updateChecker():
+    # get the parent of the current directory
+    parentDir = os.path.dirname(os.getcwd())
+    # get the current directory
+    currentDir = os.getcwd()
 # get the current version
     try:
         with open("version.txt", "r") as version:
@@ -48,62 +53,78 @@ async def updateChecker():
     currentVersion[2] = int(currentVersion[2])
     latestVersion[2] = int(latestVersion[2])
 
+    misc_functions.logWarn("Current version: " + str(currentVersion))
+    misc_functions.logWarn("Latest version: " + str(latestVersion))
+    if currIsPreview:
+        misc_functions.logWarn("Current version is a preview version.")
+        misc_functions.logWarn("Preview version: "+str(currentVersion[2]))
+    if downloadIsPreview:
+        misc_functions.logWarn("Latest version is a preview version.")
+        misc_functions.logWarn("Preview version: "+str(latestVersion[2]))
+    
+
     # if the current version is older than the latest version
     if currentVersion[0] < latestVersion[0]:
-        # download the latest version
-        r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/master", stream=True)
-        with open("Karmel.zip", "wb") as f:
-            shutil.copyfileobj(r.raw, f)
-        # unzip the latest version
-        with zipfile.ZipFile("Karmel.zip", "r") as zip_ref:
-            zip_ref.extractall()
+        # download the new version into the parent folder
+        r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch, stream=True)
+        # download zip in parentDir
+        with open(parentDir+"/Karmel.zip", "wb") as f:
+            shutil.copyfileobj(r.raw, f)    
+        # unzip the new version into the parent folder
+        with zipfile.ZipFile(parentDir+"/Karmel.zip", "r") as zip_ref:
+            # replace the old files in the current directory with the new files
+            zip_ref.extractall(currentDir)
         # delete the zip file
-        os.remove("Karmel.zip")
+        os.remove(parentDir+"/Karmel.zip")
         # delete the old version
-        os.remove("version.txt")
+        os.remove("version.txt")    
         # rename the new version
-        os.rename("Karmel-master/version.txt", "version.txt")
+        os.rename(currentDir+"/Karmel-master/version.txt", "version.txt")
         # delete the old files
-        shutil.rmtree("Karmel-master")
+        shutil.rmtree(currentDir+"/Karmel-master")
         # restart the bot
         os.execv(sys.executable, ['python'] + sys.argv)
 
     elif currIsPreview and not downloadIsPreview:
-        # download the latest version
-        r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/master", stream=True)
-        with open("Karmel.zip", "wb") as f:
-            shutil.copyfileobj(r.raw, f)
-        # unzip the latest version
-        with zipfile.ZipFile("Karmel.zip", "r") as zip_ref:
-            zip_ref.extractall()
+        # download the new version into the parent folder
+        r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch, stream=True)
+        # download zip in parentDir
+        with open(parentDir+"/Karmel.zip", "wb") as f:
+            shutil.copyfileobj(r.raw, f)    
+        # unzip the new version into the parent folder
+        with zipfile.ZipFile(parentDir+"/Karmel.zip", "r") as zip_ref:
+            # replace the old files in the current directory with the new files
+            zip_ref.extractall(currentDir)
         # delete the zip file
-        os.remove("Karmel.zip")
+        os.remove(parentDir+"/Karmel.zip")
         # delete the old version
-        os.remove("version.txt")
+        os.remove("version.txt")    
         # rename the new version
-        os.rename("Karmel-master/version.txt", "version.txt")
+        os.rename(currentDir+"/Karmel-master/version.txt", "version.txt")
         # delete the old files
-        shutil.rmtree("Karmel-master")
+        shutil.rmtree(currentDir+"/Karmel-master")
         # restart the bot
         os.execv(sys.executable, ['python'] + sys.argv)
-    elif currIsPreview and downloadIsPreview:
+    if currIsPreview and downloadIsPreview:
         # compare the preview versions
         if currentVersion[2] < latestVersion[2]:
-            # download the latest version
-            r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/master", stream=True)
-            with open("Karmel.zip", "wb") as f:
-                shutil.copyfileobj(r.raw, f)
-            # unzip the latest version
-            with zipfile.ZipFile("Karmel.zip", "r") as zip_ref:
-                zip_ref.extractall()
+            # download the new version into the parent folder
+            r = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch, stream=True)
+            # download zip in parentDir
+            with open(parentDir+"/Karmel.zip", "wb") as f:
+                shutil.copyfileobj(r.raw, f)    
+            # unzip the new version into the parent folder
+            with zipfile.ZipFile(parentDir+"/Karmel.zip", "r") as zip_ref:
+                # replace the old files in the current directory with the new files
+                zip_ref.extractall(currentDir)
             # delete the zip file
-            os.remove("Karmel.zip")
+            os.remove(parentDir+"/Karmel.zip")
             # delete the old version
-            os.remove("version.txt")
+            os.remove("version.txt")    
             # rename the new version
-            os.rename("Karmel-master/version.txt", "version.txt")
+            os.rename(currentDir+"/Karmel-master/version.txt", "version.txt")
             # delete the old files
-            shutil.rmtree("Karmel-master")
+            shutil.rmtree(currentDir+"/Karmel-master")
             # restart the bot
             os.execv(sys.executable, ['python'] + sys.argv)
         else:
