@@ -1,96 +1,5 @@
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.25, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-No update
-On preview branch. Bugs will ocur.
-Current version: [2.3, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-No update
-On preview branch. Bugs will ocur.
-Current version: [2.3, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-No update
-On preview branch. Bugs will ocur.
-On preview branch. Bugs will ocur.
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/"preview"/version.txt
-On preview branch. Bugs will ocur.
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
-On preview branch. Bugs will ocur.
-Current version: [2.3, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-No update
+Pulled latest version from GitHub.
+Killing process and running bot.py
 https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
 On preview branch. Bugs will ocur.
 Current version: [2.25, 'PREVIEW', 6]
@@ -107,8 +16,6 @@ NoneType: None
 ------------------------------------------------------------
 Pulled latest version from GitHub.
 Killing process and running bot.py
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/master/version.txt
-On preview branch. Bugs will ocur.
 https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
 On preview branch. Bugs will ocur.
 Current version: [2.25, 'PREVIEW', 6]
@@ -123,10 +30,21 @@ Updating...
 NoneType: None
 
 ------------------------------------------------------------
+Failed to pull from Github.
+
+Traceback (most recent call last):
+  File "c:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 22, in <module>
+    repo.git.origin.pull()
+AttributeError: 'function' object has no attribute 'pull'
+
+Traceback (most recent call last):
+  File "c:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 22, in <module>
+    repo.git.origin.pull()
+AttributeError: 'function' object has no attribute 'pull'
+
+------------------------------------------------------------
 Pulled latest version from GitHub.
 Killing process and running bot.py
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/master/version.txt
-On preview branch. Bugs will ocur.
 https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
 On preview branch. Bugs will ocur.
 Current version: [2.25, 'PREVIEW', 6]
@@ -139,6 +57,50 @@ New version available
 
 Updating...
 NoneType: None
+
+------------------------------------------------------------
+Failed to pull from Github.
+
+Traceback (most recent call last):
+  File "c:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 22, in <module>
+    repo.git.origin("pull")
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 696, in <lambda>
+    return lambda *args, **kwargs: self._call_process(name, *args, **kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1270, in _call_process
+    return self.execute(call, **exec_kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1064, in execute
+    raise GitCommandError(redacted_command, status, stderr_value, stdout_value)
+git.exc.GitCommandError: Cmd('git') failed due to: exit code(1)
+  cmdline: git origin pull
+  stderr: 'git: 'origin' is not a git command. See 'git --help'.'
+
+Traceback (most recent call last):
+  File "c:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 22, in <module>
+    repo.git.origin("pull")
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 696, in <lambda>
+    return lambda *args, **kwargs: self._call_process(name, *args, **kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1270, in _call_process
+    return self.execute(call, **exec_kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1064, in execute
+    raise GitCommandError(redacted_command, status, stderr_value, stdout_value)
+git.exc.GitCommandError: Cmd('git') failed due to: exit code(1)
+  cmdline: git origin pull
+  stderr: 'git: 'origin' is not a git command. See 'git --help'.'
+
+------------------------------------------------------------
+Pulled latest version from GitHub.
+Killing process and running bot.py
+Failed to pull from Github.
+
+Traceback (most recent call last):
+  File "c:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 22, in <module>
+    repo.git.pull.origin()
+AttributeError: 'function' object has no attribute 'origin'
+
+Traceback (most recent call last):
+  File "c:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 22, in <module>
+    repo.git.pull.origin()
+AttributeError: 'function' object has no attribute 'origin'
 
 ------------------------------------------------------------
 Pulled latest version from GitHub.
@@ -175,50 +137,33 @@ NoneType: None
 ------------------------------------------------------------
 Pulled latest version from GitHub.
 Killing process and running bot.py
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-New version available
+Failed to pull from Github.
 
-Updating...
-NoneType: None
+Traceback (most recent call last):
+  File "c:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 20, in <module>
+    repo.checkout(variables.config.get("branch"))
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 696, in <lambda>
+    return lambda *args, **kwargs: self._call_process(name, *args, **kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1270, in _call_process
+    return self.execute(call, **exec_kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1064, in execute
+    raise GitCommandError(redacted_command, status, stderr_value, stdout_value)
+git.exc.GitCommandError: Cmd('git') failed due to: exit code(128)
+  cmdline: git checkout preview
+  stderr: 'fatal: not a git repository (or any of the parent directories): .git'
 
-------------------------------------------------------------
-Pulled latest version from GitHub.
-Killing process and running bot.py
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-New version available
-
-Updating...
-NoneType: None
-
-------------------------------------------------------------
-Pulled latest version from GitHub.
-Killing process and running bot.py
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-New version available
-
-Updating...
-NoneType: None
+Traceback (most recent call last):
+  File "c:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 20, in <module>
+    repo.checkout(variables.config.get("branch"))
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 696, in <lambda>
+    return lambda *args, **kwargs: self._call_process(name, *args, **kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1270, in _call_process
+    return self.execute(call, **exec_kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1064, in execute
+    raise GitCommandError(redacted_command, status, stderr_value, stdout_value)
+git.exc.GitCommandError: Cmd('git') failed due to: exit code(128)
+  cmdline: git checkout preview
+  stderr: 'fatal: not a git repository (or any of the parent directories): .git'
 
 ------------------------------------------------------------
 Pulled latest version from GitHub.
@@ -237,36 +182,33 @@ Updating...
 NoneType: None
 
 ------------------------------------------------------------
-Pulled latest version from GitHub.
-Killing process and running bot.py
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-New version available
+Failed to pull from Github.
 
-Updating...
-NoneType: None
+Traceback (most recent call last):
+  File "C:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 20, in <module>
+    repo.checkout(variables.config.get("branch"))
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 696, in <lambda>
+    return lambda *args, **kwargs: self._call_process(name, *args, **kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1270, in _call_process
+    return self.execute(call, **exec_kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1064, in execute
+    raise GitCommandError(redacted_command, status, stderr_value, stdout_value)
+git.exc.GitCommandError: Cmd('git') failed due to: exit code(128)
+  cmdline: git checkout preview
+  stderr: 'fatal: not a git repository (or any of the parent directories): .git'
 
-------------------------------------------------------------
-Pulled latest version from GitHub.
-Killing process and running bot.py
-https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
-On preview branch. Bugs will ocur.
-Current version: [2.25, 'PREVIEW', 6]
-Latest version: [2.3, 'PREVIEW', 6]
-Current version is a preview version.
-Preview version: 6
-Latest version is a preview version.
-Preview version: 6
-New version available
-
-Updating...
-NoneType: None
+Traceback (most recent call last):
+  File "C:\Users\kovre\OneDrive\Desktop\OpenAI\GPT-3\Karmel\update_handler.py", line 20, in <module>
+    repo.checkout(variables.config.get("branch"))
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 696, in <lambda>
+    return lambda *args, **kwargs: self._call_process(name, *args, **kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1270, in _call_process
+    return self.execute(call, **exec_kwargs)
+  File "C:\Users\kovre\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\git\cmd.py", line 1064, in execute
+    raise GitCommandError(redacted_command, status, stderr_value, stdout_value)
+git.exc.GitCommandError: Cmd('git') failed due to: exit code(128)
+  cmdline: git checkout preview
+  stderr: 'fatal: not a git repository (or any of the parent directories): .git'
 
 ------------------------------------------------------------
 Pulled latest version from GitHub.

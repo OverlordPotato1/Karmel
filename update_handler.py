@@ -5,6 +5,7 @@ import sys
 import variables
 import misc_functions as misc
 import datetime
+import traceback
 
 time.sleep(0.25)
 # get the parent of the current directory
@@ -12,15 +13,9 @@ parentDir = os.path.dirname(os.getcwd())
 # get the current directory
 currentDir = os.getcwd()
 # using gitpython set the branch from branch and pull the latest version into the parent directory
-# os.chdir(parentDir)
 repo = git.Repo(currentDir)
-# set the branch to pull from
-try:
-    branch = variables.config.get("branch")
-    repo.git.checkout(branch)
-    repo.git.pull()
-except:
-    raise
+repo.git.checkout(variables.config.get("branch"))
+repo.remotes.origin.pull()
 misc.logWarn("Pulled latest version from GitHub.")
 misc.logWarn("Killing process and running bot.py")
 now = datetime.datetime.now()
