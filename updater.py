@@ -14,10 +14,11 @@ import asyncio
 import misc_functions
 import git
 
-branch = "preview"
+
 
 
 async def updateChecker():
+    branch = "preview"
     # get the parent of the current directory
     parentDir = os.path.dirname(os.getcwd())
     # get the current directory
@@ -67,8 +68,13 @@ async def updateChecker():
 
     # if the current version is older than the latest version
     if currentVersion[0] < latestVersion[0]:
-        #using gitpython download the new version into the parent folder
-        repo = git.Repo.clone_from("https://github.com/OverlordPotato1/Karmel.git", parentDir+"/Karmel")
+        # launch a new terminal and run update_handler.py
+        os.execv(sys.executable, ['python update_handler.py'])
+
+
+    else:
+        misc_functions.logWarn("No update")
+    
 
     # elif currIsPreview and not downloadIsPreview:
     #     # download the new version into the parent folder
