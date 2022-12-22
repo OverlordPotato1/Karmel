@@ -78,3 +78,16 @@ Preview version: 6
 Latest version is a preview version.
 Preview version: 6
 No update
+On preview branch. Bugs will ocur.
+On preview branch. Bugs will ocur.
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/"preview"/version.txt
+On preview branch. Bugs will ocur.
+https://raw.githubusercontent.com/OverlordPotato1/Karmel/preview/version.txt
+On preview branch. Bugs will ocur.
+Current version: [2.3, 'PREVIEW', 6]
+Latest version: [2.3, 'PREVIEW', 6]
+Current version is a preview version.
+Preview version: 6
+Latest version is a preview version.
+Preview version: 6
+No update

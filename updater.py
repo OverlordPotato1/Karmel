@@ -19,6 +19,8 @@ import variables
 
 async def updateChecker():
     branch = variables.config.get("branch")
+    # remove the "" around the branch
+    branch = branch[1:-1]
     # get the parent of the current directory
     parentDir = os.path.dirname(os.getcwd())
     # get the current directory
@@ -34,6 +36,7 @@ async def updateChecker():
 
     # get the latest version
     try:
+        misc_functions.logWarn("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch+"/version.txt")
         latestVersion = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch+"/version.txt").text
     except:
         misc_functions.logWarn("Failed to get version.txt from GitHub.  Retrying in 4 minutes.")
