@@ -8,6 +8,7 @@ from variables import *
 from primary_activated import *
 import discord
 import wit_Handling
+import updater
 
 bot = app_commands.CommandTree(client)
 
@@ -352,6 +353,8 @@ async def drawImage(ctx, prompt: str):
 
 @client.event
 async def on_ready():
+    # start updater without blocking
+    asyncio.create_task(updater())
     # delete log
     if os.path.exists("log.txt"):
         os.remove("log.txt")

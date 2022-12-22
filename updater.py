@@ -13,6 +13,8 @@ import time
 import asyncio
 import misc_functions
 
+branch = "preview"
+
 async def updateChecker():
 # get the current version
     try:
@@ -25,7 +27,7 @@ async def updateChecker():
 
     # get the latest version
     try:
-        latestVersion = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/master/version.txt").text
+        latestVersion = requests.get("https://raw.githubusercontent.com/OverlordPotato1/Karmel/"+branch+"/version.txt").text
     except:
         misc_functions.logWarn("Failed to get version.txt from GitHub.  Retrying in 4 minutes.")
         time.sleep(60*4)
@@ -34,15 +36,17 @@ async def updateChecker():
     # split the version numbers into a list
     currentVersion = currentVersion.split(" ")
     latestVersion = latestVersion.split(" ")
-    # set currentVersion and latestVersion to doubles
-    currentVersion = float(currentVersion[0])
-    latestVersion = float(latestVersion[0])
 
     if len(currentVersion) > 1:
         currIsPreview = True
     if len(latestVersion) > 1:
         downloadIsPreview = True
         misc_functions.logWarn("On preview branch. Bugs will ocur.")
+
+    currentVersion[0] = float(currentVersion[0])
+    latestVersion[0] = float(latestVersion[0])
+    currentVersion[2] = int(currentVersion[2])
+    latestVersion[2] = int(latestVersion[2])
 
     # if the current version is older than the latest version
     if currentVersion[0] < latestVersion[0]:
@@ -102,6 +106,10 @@ async def updateChecker():
             shutil.rmtree("Karmel-master")
             # restart the bot
             os.execv(sys.executable, ['python'] + sys.argv)
+        else:
+            print("No update available")
+            time.sleep(60*4)
+            asyncio.run(updateChecker())
     else:
         print("No update available")
         time.sleep(60*4)
