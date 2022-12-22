@@ -20,11 +20,11 @@ class config():
         # split config.txt into a list
         config = config.split("\n")
         # convert the list into a dictionary
-        config = dict([x.split(": ") for x in config])
+        self.config = dict([x.split(": ") for x in config])
 
     def __write(self):
         # convert dictionary into a list with each item being a different line
-        config = [key + ": " + value for key, value in config.items()]
+        config = [key + ": " + value for key, value in self.config.items()]
         # convert the list into a string
         config = "\n".join(config)
         # write the new config to config.txt
@@ -32,10 +32,10 @@ class config():
             config.write(config)
 
     def get(self, key):
-        return config[key]
+        return self.config[key]
 
     def set(self, key, value):
-        config[key] = value
+        self.config[key] = value
         # write the new config to config.txt
         self.__write()
 
