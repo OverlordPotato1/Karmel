@@ -1,6 +1,29 @@
 import inspect
 import json
 from misc_functions import *
+import os
+
+# open config.txt
+class config():
+    def __init__(self, file):
+        # if the file does not exist, create it
+        if not os.path.isfile(file):
+            with open(file, "w") as config:
+                # write the default config from default_config_DO_NOT_EDIT.config
+                with open("default_config_DO_NOT_EDIT.config", "r") as default_config:
+                    default_config = default_config.read()
+                config.write(default_config)
+
+        # open the file                
+        with open(file, "r") as config:
+            config = config.read()
+        # split config.txt into a list
+        config = config.split("\n")
+        # convert the list into a dictionary
+        config = dict([x.split(": ") for x in config])
+
+    def get(self, key):
+        return config[key]
 
 class async_dictionary():
     def __init__(self, file):

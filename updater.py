@@ -6,19 +6,19 @@
 
 import os
 import requests
-import shutil
-import zipfile
 import sys
 import time
 import asyncio
 import misc_functions
 import git
+import files
+import variables
 
 
 
 
 async def updateChecker():
-    branch = "preview"
+    branch = variables.config.get("branch")
     # get the parent of the current directory
     parentDir = os.path.dirname(os.getcwd())
     # get the current directory

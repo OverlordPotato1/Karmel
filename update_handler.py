@@ -13,8 +13,7 @@ currentDir = os.getcwd()
 # os.chdir(parentDir)
 repo = git.Repo(currentDir)
 # set the repo to pull from
-repo.git.checkout(branch)
-repo.git.pull("https://github.com/OverlordPotato1/Karmel.git", branch, force=True)
+repo.git.pull()
 # wait 1 second
 time.sleep(0.25)
 

@@ -18,6 +18,8 @@ client = discord.Client(intents=intents)
 
 global_memory = files.async_dictionary("memory.json")
 
+config = files.config("config.json")
+
 
 
 
