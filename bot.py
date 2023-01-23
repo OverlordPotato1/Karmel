@@ -15,23 +15,6 @@ memory = {}
 
 #########################################
 #                                       #
-#   Definitions                         #
-#                                       #
-#########################################
-
-
-
-def determineSource(message):
-    if "https://www.youtube.com/watch?v=" in message:
-        return "youtube"
-    elif "https://open.spotify.com/track/" in message:
-        #if its a spotify link
-        return "spotify"
-    else:
-        return message
-        
-#########################################
-#                                       #
 #   Bot Commands                        #
 #                                       #
 #########################################
