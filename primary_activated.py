@@ -10,6 +10,10 @@ from OAI_Functions import *
 async def activated(message, isPing=False):
 
     memory = files.loadJson("memory.json")
+    
+    if memory[str(message.author.id)]["defining"] == "true":
+        return
+    
     if str(message.author.id) not in memory:
         memory[str(message.author.id)] = {}
         memory[str(message.author.id)]["defining"] = "false"
@@ -340,4 +344,4 @@ async def activated(message, isPing=False):
         # send the message to use_codex
         await use_codex(message)
 
-    await gptWithMemory(message)
+    await gpt_turbo(message)

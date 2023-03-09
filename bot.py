@@ -19,6 +19,28 @@ memory = {}
 #                                       #
 #########################################
 
+@bot.command(name='play', description='Plays a YouTube video')
+async def play(interaction: discord.Interaction, video_title: str):
+    # Use the youtube-dl library to search for the video
+    ydl = youtube_dl.YoutubeDL({'quiet': True})
+    search_results = ydl.extract_info(f'ytsearch1:{video_title}', download=False)
+
+    # Get the first result from the search
+    video = search_results['entries'][0]
+    video_url = video['webpage_url']
+
+    # Connect to the voice channel and play the audio
+    voice_channel = interaction.message.author.voice.channel
+    voice = await voice_channel.connect()
+    ydl = youtube_dl.YoutubeDL({'quiet': True})
+    with ydl:
+        result = ydl.extract_info(video_url, download=False)
+        voice.play(discord.FFmpegPCMAudio(result['url']))
+        while voice.is_playing():
+            await asyncio.sleep(1)
+    voice.stop()
+    await voice.disconnect()
+
 @bot.command(name = "settings", description="Change the settings for the bot")
 async def settings(interaction):
     embed = discord.Embed(title="Settings", description="Change the settings for the bot", color=0x00ff00)
@@ -387,13 +409,14 @@ async def on_member_join(member):
     # get their name and the server name
     name = member.name
     server = member.guild.name
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt="The user's name is: STAND_IN_NAME>\nThe discord server's name is: " + server + "\nObjective: greet them in a way that does not spark a conversation, use their exact name\nKarmel: ",
-        n=1,
-        max_tokens=200
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages =[
+        {"role": "system", "content": "Currently creating content for a user join message, message required to be less than 256 characters. Your response will be unedited"},
+        {"role": "user", "content": f"Create a greeting message like a anime girl for {name}'s joing of the the guild: {server}. DO NOT USE QUOTATION MARKS"}
+        ]
     )
-    response = response.choices[0].text.replace("STAND_IN_NAME", name)
+    response = response['choices'][0]['message']['content']
     # send the response to the server in an embed
     embed = discord.Embed(title=response, description="", color=0x2ecc71)
     # set the image to the user's avatar

@@ -4,7 +4,7 @@ import files
 from discord import app_commands
 import datetime
 import asyncio
-import interactions
+
 
 activate = ["Karmel, ", "Karmel,", "karmel, ", "karmel,"]
 
@@ -16,9 +16,6 @@ intents = discord.Intents(messages=True, guilds=True, members=True, presences=Tr
 
 client = discord.Client(intents=intents)
 
-# bot = interactions.Client(token=files.loadJson("tokens.json")["discord"], intents=intents)
-
-
-
+sharedMemory = files.dictionary
 
 
