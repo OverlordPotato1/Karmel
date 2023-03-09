@@ -1,4 +1,6 @@
 /tokens.json
-__pycache__/files.cpython-310.pyc
-__pycache__/OAI_Functions.cpython-310.pyc
-__pycache__/primary_activated.cpython-310.pyc
+__pycache__
+.vs
+.vscode
+doing_shit_chatgpt_told_me_to_do.py
+memory.json

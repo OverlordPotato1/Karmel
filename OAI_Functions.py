@@ -2,58 +2,53 @@ import traceback
 import openai
 import discord
 import files
-from files import async_dictionary
 from variables import *
 from discord import app_commands
 import datetime
 import asyncio
-import interactions
 from misc_functions import asyncErr
+import tiktoken
+import time
+import misc_functions
+from files import sharedMemory
+
+
+role = "role"
+system = "system"
+user = "user"
+assistant = "assistant"
+content = "content"
 
 openai.api_key = files.loadJson("tokens.json")["openai"]
 
-async def memoryHandler(authorId, newMessage, newResponse):
-    await global_memory.set_dict(authorId, "response-1", await global_memory.read_dict(authorId, "response"))
-    await global_memory.set_dict(authorId, "response", newResponse)
-    await global_memory.set_dict(authorId, "message-1", await global_memory.read_dict(authorId, "message"))
-    await global_memory.set_dict(authorId, "message", newMessage)
+# encoding = tiktoken.get_encoding("gpt3.5")
 
 ############################################################################################################################################################################
 # Function that will send a prompt to GPT-3 and return the response (Call and Response) ##
 ###########################################################################################
 
-async def CAR(prompt, maxTokens=300, engine="text-davinci-003", temperature=0.9):
+async def CAR(prompt, max_tokens=300, engine="text-davinci-003"):
     # send the prompt to OpenAI and get the response
-    try:
-        response = openai.Completion.create(
-            engine=engine,
-            prompt=prompt,
-            temperature=temperature,
-            max_tokens=maxTokens
-        )
-        isRateLimit = False
-    except:
-        isRateLimit = True
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        temperature=0.9,
+        max_tokens=300
+    )
     # return the response
-    return response.choices[0].text, response, isRateLimit
+    return response
 
 ############################################################################################################################################################################
 # Function to request information from Codex instead of GPT-3 ##
 ################################################################
 
 async def use_codex(prompt):
-    prompt.content = "Q: "+prompt.content+"\nA:"
+    prompt = prompt.content
     # using CAR, send the prompt to Codex
-    response, isRateLimit = await CAR(prompt.content, engine="code-davinci-002", maxTokens=4000)
-    # replace <code> tags with code blocks
-    if not isRateLimit:
-        response.choices[0].text = response.choices[0].text.replace("<code>", "```").replace("</code>", "```")
-        # return the response
-        embed = discord.Embed(title="Codex Response", description=response.choices[0].text, color=0x00ff00)
-        # set the footer of the embed to include a disclaimer
-        embed.set_footer(text="Code created by Codex. The functionality and safety of this code cannot be guaranteed.  Use at your own risk.")
-    else:
-        embed = discord.Embed(title="Codex Error", description="Codex is currently rate limited. Please try again later.", color=0xff0000)
+    response = await CAR(prompt, engine="code-davinci-002")
+    # return the response
+    embed = discord.Embed(title="Codex Response", description=response.choices[0].text, color=0x00ff00)
+    embed.footer = "Powered by OpenAI Codex, please note this may not be accurate or relevant.\nUse at your own risk."
     await prompt.channel.send(embed=embed)
     return
 
@@ -62,6 +57,9 @@ async def use_codex(prompt):
 #################################################################################
 
 async def isBad(message):
+    '''
+    Checks if the message is in violation of OpenAI's content policy
+    '''
     # send the message to OpenAI's moderation API
     response = openai.Moderation.create(
         input = message.content
@@ -100,14 +98,14 @@ async def isBad(message):
     return True
 
 ############################################################################################################################################################################
-# Function that sends a prompt to DALL-E 2 and returns the image ##
-###################################################################
+# Function that sends a prompt to DALL-E2 and return the image ##
+#################################################################
 
 async def draw(message):
 
     # send the prompt to OpenAI's moderation API and return if the message is in violation of the content policy
-    if await isBad(message):
-        return
+    # if await isBad(message):
+    #     return
 
     # check if message is a string or a discord.Message object
     if isinstance(message, str):
@@ -115,18 +113,17 @@ async def draw(message):
     else:
         prompt = message.content
 
-    async with message.channel.typing():
-        try:
-            response = openai.Image.create(
-                prompt = prompt,
-                n=1,
-                size="512x512"
-            )
-        except openai.error.InvalidRequestError: # if the prompt is rejected by OpenAI's safety system, send an embed to the channel and return
-            embed = discord.Embed(title="Prompt rejected", description="openai.error.InvalidRequestError: Your request was rejected as a result of our safety system. Your prompt may contain text that is not allowed by out safety system.")
-            await message.channel.send(embed=embed)
-            return response
-        return response
+    # async with message.channel.typing():
+    try:
+        response = openai.Image.create(
+            prompt = prompt,
+            n=1,
+            size="512x512"
+        )
+    except openai.error.InvalidRequestError: # if the prompt is rejected by OpenAI, return "REJECTED"
+        
+        return "REJECTED"
+    return response
 
 ############################################################################################################################################################################
 # Fallback to standard GPT-3 if there is an error with the memory ##
@@ -150,70 +147,179 @@ async def gptWithoutMemory(message):
 ############################################
 
 
-async def gptWithMemory(message):
+# async def gptWithMemory(message):
 
-    # prevents the bot to responding to things while another thread recieves input for a command
-    if await global_memory.read_dict(str(message.author.id), "defining") == "true":
-            return
+#     memory = files.loadJson("memory.json")
 
-    # remove the any form of the activation word from the message
-    for i in range(0, len(activate)):
-            if activate[i] in message.content:
-                message.content = message.content.replace(activate[i], "")
-    # also remove the bot's mention
-    message.content = message.content.replace("<@" + str(client.user.id) + ">", "")
-    # Saves as message.content first incase of an error as message.content is not filtered in gptWithoutMemory
-    messageContent = message.content
+#     # prevents the bot to responding to things while another thread recieves input for a command
+#     if memory[str(message.author.id)]["defining"] == "true":
+#             return
 
-    try:
-        guildName = message.guild.name
-    except:
-        guildName = "NOT IN SERVER. DM"
+#     try:
+#         guildName = message.guild.name
+#     except:
+#         guildName = "NOT IN SERVER. DM"
 
-    # prevents the prompt from being sent to the AI if the prompt is against openai's content policy
-    if await isBad(message):
-        return
+#     # prevents the prompt from being sent to the AI if the prompt is against openai's content policy
+#     if await isBad(message):
+#         return
     
-    try:
+#     try:
         
-        try:
-            test = await global_memory.read_dict(str(message.author.id), "message")
-        except:
-            await global_memory.set_dict(str(message.author.id), "message", "NONE")
-            await global_memory.set_dict(str(message.author.id), "response", "NONE")
-        
-        try:
-            test = await global_memory.read_dict(str(message.author.id), "message-1")
-        except:
-            await global_memory.set_dict(str(message.author.id), "message-1", "NONE")
-            await global_memory.set_dict(str(message.author.id), "response-1", "NONE")
+#         try:
+#             test = memory[message.author.id]["message"]
+#         except:
+#             memory[str(message.author.id)]["message"] = "NONE"
+#             memory[str(message.author.id)]["response"] = "NONE"
 
-        author = str(message.author.id)
-        aName = await global_memory.read_dict(author, "name")
-        aGender = await global_memory.read_dict(author, "gender")
-        frstSeen = await global_memory.read_dict(author, "definitionDOW") + " " + await global_memory.read_dict(author, "definitiondate") + " UTC"
-        clnt = client.user.name+" (Female): "
-        usr = aName+" ("+aGender+"): "
+#         author = str(message.author.id)
+#         aName = memory[author]["name"]
+#         aGender = memory[author]["gender"]
+#         frstSeen = memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + " UTC"
 
-        # get the current time in UTC and convert it to a human readable format
-        now = datetime.datetime.utcnow()
-        now = now.strftime("%A %Y-%m-%d %H:%M:%S")
-        now = str(now) + " UTC"
+#         # get the current time in UTC and convert it to a human readable format
+#         now = datetime.datetime.utcnow()
+#         now = now.strftime("%Y-%m-%d %H:%M:%S")
+#         now = str(now) + " UTC"
 
-        async with message.channel.typing():
+#         async with message.channel.typing():
             
-            prompt = "{username:"+aName+", gender: "+aGender+", first seen: "+frstSeen+'}\nIt is currently '+now+', Server name: '+guildName+'\n'+usr+ await global_memory.read_dict(author, "message-1")+'\n'+clnt+await global_memory.read_dict(author, "response-1")+'\n'+usr+await global_memory.read_dict(author, "message")+"\n"+clnt+await global_memory.read_dict(author, "response")+"\n"+aName+" ("+aGender+"): "+messageContent+"\n"+client.user.name+" (Female): "
+#             prompt = "{username:" + aName + ", gender: " + aGender + ", first seen: " + memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + ' UTC}\nIt is currently '+ now + ', Server name: ' + guildName + '\n' + memory[author]["name"] + " (" + memory[author]["gender"] + "): " + memory[author]["message"] + "\n"+client.user.name+" (Female): " + memory[author]["response"] + "\n"+ memory[author]["name"] + " (" + memory[author]["gender"] + "): " + messageContent + "\n"+client.user.name+" (Female): "
+#             memory[author]["message"] = messageContent
 
-            print(prompt)
-            response, fullResponse, rl = await CAR(prompt)
-            print(response)
-            await memoryHandler(author, messageContent, response)
+#             print(prompt)
+#             response = openai.Completion.create(
+#                 engine="text-davinci-003",
+#                 prompt=prompt,
+#                 n=1,
+#                 max_tokens=200
+#             )
+#             print(response.choices[0].text)
+#             memory[author]["response"] = response.choices[0].text
+#         # reply to the user with the response
+#         if (guildName == "NOT IN SERVER. DM"):
+#             await message.channel.send(response.choices[0].text)
+#         else:
+#             await message.channel.send(response.choices[0].text, reference=message)
+#         #save memory to file with json
+#         files.saveJson("memory.json", memory)
+#     except:
+#         await asyncErr(message, traceback.format_exc())
+#         await gptWithoutMemory(message)
 
-        # reply to the user with the response
-        await message.channel.send(response, reference=message)
-    except:
-        await asyncErr(message, traceback.format_exc())
-        await gptWithoutMemory(message)
+import re
+
+async def gpt_turbo(message):
+    '''
+    Function that send and recieves information from GPT-3.5-turbo
+    '''
+
+    
+    await sharedMemory.load()
+    author = str(message.author.id)
+
+    if await sharedMemory.get(str(message.author.id), "defining") == "true":
+            return
+    aName = await sharedMemory.get(author, "name")
+    aGender = await sharedMemory.get(author, "gender")
+    time = await misc_functions.hrTime()
+    newMemHist = []
+    tokenTracker = []
+    if await sharedMemory.doesExist(author, "memory2") == False:
+        print(f"Creating user {author}")
+        await sharedMemory.wipe(author, "memory2")
+        await sharedMemory.wipe(author, "tokenTracker")
+        tokenTracker = [0]
+        newMemHist = [""]
+        await sharedMemory.write(author, "memory2", newMemHist)
+    else:
+        newMemHist = await sharedMemory.get(author, "memory2")
+        tokenTracker = await sharedMemory.get(author, "tokenTracker")
+    sysMessage = f"You are a cute cat girl named Karmel. Be as cute as possible at all times, even when writing code and answering questions. If you use special characters add a \ before them. The user's name: {aName}, gender: {aGender}. Time: {time}. Act like a generic anime childhood friend. Speak energtically and cutely with emoticons and emojis. Don't use roleplay syntax. Do not ask how you can be of assistance or prompt further conversation. Always take your time and explain your thinking. To generate an image with DALL-E 2 text to image AI, reply with the following template (case sensitive): \"TURBOtoIMG(\"YOUR IMAGE PROMPT\")\". Their name can be changed with: \"RENAME(\"USER'S NEW NAME\")\". Gender: \"REGENDER(\"USER'S NEW GENDER\")\". You can purge your memory at the user's request with: \"PURGE_MEMORY\""
+    newMemHist[0] = {role: system, content: sysMessage}
+    newMemHist.append({role: user, content: message.content})
+    
+
+    await sharedMemory.get(author, "memory2")
+
+    # print(newMemHist)
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages= newMemHist
+    )
+
+    # print(response)
+
+    strResponse = response['choices'][0]['message']['content']
+    usage = response['usage']["total_tokens"]
+    for num in tokenTracker:
+        usage -= num
+    tokenTracker.append(usage)
+    newMemHist.append({role: assistant, content: strResponse})
+
+    pattern =r'TURBOtoIMG\("(?P<prompt>.*?)"\)'
+
+    match = re.search(pattern, strResponse)
+
+    if match:
+        imgPrompt = match.group('prompt')
+        imgResponse = await draw(imgPrompt)
+        image_url = imgResponse['data'][0]['url']
+    else:
+        image_url = ""
+    
+    pattern =r'RENAME\("(?P<name>.*?)"\)'
+
+    match = re.search(pattern, strResponse)
+
+    if match:
+        nname = match.group('name')
+        sharedMemory.write(author, "name", nname)
+
+    pattern =r'REGENDER\("(?P<gender>.*?)"\)'
+
+    match = re.search(pattern, strResponse)
+
+    if match:
+        ngender = match.group('gender')
+        sharedMemory.write(author, "gender", ngender)
+
+    pattern =r'PURGE_MEMORY'
+
+    match = re.search(pattern, strResponse)
+
+    if match:
+        print(f"Wiping user {author}")
+        await sharedMemory.wipe(author, "memory2")
+        await sharedMemory.wipe(author, "tokenTracker")
+        tokenTracker = [0]
+        newMemHist = [""]
+        await sharedMemory.write(author, "memory2", newMemHist)
+
+    
+    totalTokenInMemory = -1
+    while totalTokenInMemory > 2000 or totalTokenInMemory == -1:
+        totalTokenInMemory = 0
+        for i in tokenTracker:
+            totalTokenInMemory += i
+        if totalTokenInMemory > 2000:
+            print("Total tokens exceeds max, deleting...")
+            del newMemHist[1]
+            del newMemHist[1]
+            del tokenTracker[1]
+
+    await sharedMemory.write(author, "tokenTracker", tokenTracker)
+
+    await sharedMemory.write(author, "memory2", newMemHist)
+
+    await sharedMemory.save()
+    
+
+
+    await message.channel.send(strResponse)
+    if (image_url != ""):
+        await message.channel.send(image_url)
+
 
 
 

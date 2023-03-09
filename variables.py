@@ -4,7 +4,7 @@ import files
 from discord import app_commands
 import datetime
 import asyncio
-import interactions
+
 
 activate = ["Karmel, ", "Karmel,", "karmel, ", "karmel,"]
 
@@ -16,8 +16,6 @@ intents = discord.Intents(messages=True, guilds=True, members=True, presences=Tr
 
 client = discord.Client(intents=intents)
 
-global_memory = files.async_dictionary("memory.json")
-
-
+sharedMemory = files.dictionary
 
 

@@ -1,21 +1,45 @@
 import datetime
 import os
 import openai
+import youtube_dl
 import asyncio
 import files
 from OAI_Functions import *
 from variables import *
 from primary_activated import *
 import discord
-import wit_Handling
 
 bot = app_commands.CommandTree(client)
+
+memory = {}
 
 #########################################
 #                                       #
 #   Bot Commands                        #
 #                                       #
 #########################################
+
+@bot.command(name='play', description='Plays a YouTube video')
+async def play(interaction: discord.Interaction, video_title: str):
+    # Use the youtube-dl library to search for the video
+    ydl = youtube_dl.YoutubeDL({'quiet': True})
+    search_results = ydl.extract_info(f'ytsearch1:{video_title}', download=False)
+
+    # Get the first result from the search
+    video = search_results['entries'][0]
+    video_url = video['webpage_url']
+
+    # Connect to the voice channel and play the audio
+    voice_channel = interaction.message.author.voice.channel
+    voice = await voice_channel.connect()
+    ydl = youtube_dl.YoutubeDL({'quiet': True})
+    with ydl:
+        result = ydl.extract_info(video_url, download=False)
+        voice.play(discord.FFmpegPCMAudio(result['url']))
+        while voice.is_playing():
+            await asyncio.sleep(1)
+    voice.stop()
+    await voice.disconnect()
 
 @bot.command(name = "settings", description="Change the settings for the bot")
 async def settings(interaction):
@@ -385,13 +409,14 @@ async def on_member_join(member):
     # get their name and the server name
     name = member.name
     server = member.guild.name
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt="The user's name is: STAND_IN_NAME>\nThe discord server's name is: " + server + "\nObjective: greet them in a way that does not spark a conversation, use their exact name\nKarmel: ",
-        n=1,
-        max_tokens=200
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages =[
+        {"role": "system", "content": "Currently creating content for a user join message, message required to be less than 256 characters. Your response will be unedited"},
+        {"role": "user", "content": f"Create a greeting message like a anime girl for {name}'s joing of the the guild: {server}. DO NOT USE QUOTATION MARKS"}
+        ]
     )
-    response = response.choices[0].text.replace("STAND_IN_NAME", name)
+    response = response['choices'][0]['message']['content']
     # send the response to the server in an embed
     embed = discord.Embed(title=response, description="", color=0x2ecc71)
     # set the image to the user's avatar
@@ -416,54 +441,47 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    # call wit_Handling.analyseSinResponse(message.content) without waiting for it to finish
-    asyncio.ensure_future(wit_Handling.analyseSinResponse(message.content))
-    
-
-        
     async def fixShitFast():
-        if await global_memory.checkExists_category(str(message.author.id)): #if the user is not in memory.json yet, add them
-            await global_memory.set_dict(str(message.author.id), "defining", "false")
-            await global_memory.set_dict(str(message.author.id), "imageCount", 0)
-            await global_memory.set_dict(str(message.author.id), "allowImage", "true")
-            await global_memory.set_dict(str(message.author.id), "imageLastUsed", "0")
-            await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "false")
+        memory = files.loadJson("memory.json")
+        if str(message.author.id) not in memory: #if the user is not in memory.json yet, add them
+            memory[str(message.author.id)] = {}
+            memory[str(message.author.id)]["defining"] = "false"
+            memory[str(message.author.id)]["imageCount"] = 0
+            memory[str(message.author.id)]["allowImage"] = "true"
+            memory[str(message.author.id)]["imageLastUsed"] = "0"
+            memory[str(message.author.id)]["dmDisclaimer"] = "false"
         try:
             guildName = message.guild.name #get the server name
         except: #if the message is not in a server, it is a DM
             guildName = "DM" #set the server name to DM
-            
-        if not await global_memory.checkExists_variable(str(message.author.id), "dmDisclaimer"):
-            await global_memory.set_dict(str(message.author.id), "dmDisclaimer", "false")
+        try:
+            test = memory[str(message.author.id)]["dmDisclaimer"]
+        except:
+            memory[str(message.author.id)]["dmDisclaimer"] = "false"
 
-        return guildName
+        files.saveJson("memory.json", memory)
+        return guildName, memory
     
-    guildName = await fixShitFast()
+    guildName, memory = await fixShitFast()
 
     firstWord = message.content.split()[0].lower()
     
     if client.user.mentioned_in(message):
         await activated(message, isPing=True)
-        return
-    
+
     if firstWord in activate and not client.user.mentioned_in(message):
         await activated(message)
-        return
-
-    # if intentions["intents"][0]["name"] == "karmel_summon":
-    #     message.content = intentions["entities"]["content:content"][0]["value"]
-    #     embed = discord.Embed(title="Wit.ai detected intention karmel_summon", description="This action is still in development and misunderstandings are expected", color=0x00ff00)
-    #     embed.add_field(name="Passed Prompt", value=message.content)
-    #     await message.channel.send(embed=embed)
-    #     await activated(message)
-    #     return
 
     if guildName == "DM":
-        if global_memory.read_dict(str(message.author.id), "dmDisclaimer") == "false":
+        memory = files.loadJson("memory.json")
+        if memory[str(message.author.id)]["dmDisclaimer"] != "true":
             embed = discord.Embed(title="Karmel is not meant to be used in DMs", description='Only chat bot actions will be available\nMessages will not require the "Karmel, " prefix\nThis message will not be shown again', color=0xe74c3c)
             await message.channel.send(embed=embed)
-            global_memory.set_dict(str(message.author.id), "dmDisclaimer", "true")
+            memory[str(message.author.id)]["dmDisclaimer"] = "true"
+            files.saveJson("memory.json", memory)
         await activated(message)
+
+        #if they have not been defined, define them
 
     
     
