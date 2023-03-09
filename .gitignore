@@ -1,1 +1,6 @@
 /tokens.json
+__pycache__
+.vs
+.vscode
+doing_shit_chatgpt_told_me_to_do.py
+memory.json
