@@ -147,65 +147,65 @@ async def gptWithoutMemory(message):
 ############################################
 
 
-async def gptWithMemory(message):
+# async def gptWithMemory(message):
 
-    memory = files.loadJson("memory.json")
+#     memory = files.loadJson("memory.json")
 
-    # prevents the bot to responding to things while another thread recieves input for a command
-    if memory[str(message.author.id)]["defining"] == "true":
-            return
+#     # prevents the bot to responding to things while another thread recieves input for a command
+#     if memory[str(message.author.id)]["defining"] == "true":
+#             return
 
-    try:
-        guildName = message.guild.name
-    except:
-        guildName = "NOT IN SERVER. DM"
+#     try:
+#         guildName = message.guild.name
+#     except:
+#         guildName = "NOT IN SERVER. DM"
 
-    # prevents the prompt from being sent to the AI if the prompt is against openai's content policy
-    if await isBad(message):
-        return
+#     # prevents the prompt from being sent to the AI if the prompt is against openai's content policy
+#     if await isBad(message):
+#         return
     
-    try:
+#     try:
         
-        try:
-            test = memory[message.author.id]["message"]
-        except:
-            memory[str(message.author.id)]["message"] = "NONE"
-            memory[str(message.author.id)]["response"] = "NONE"
+#         try:
+#             test = memory[message.author.id]["message"]
+#         except:
+#             memory[str(message.author.id)]["message"] = "NONE"
+#             memory[str(message.author.id)]["response"] = "NONE"
 
-        author = str(message.author.id)
-        aName = memory[author]["name"]
-        aGender = memory[author]["gender"]
-        frstSeen = memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + " UTC"
+#         author = str(message.author.id)
+#         aName = memory[author]["name"]
+#         aGender = memory[author]["gender"]
+#         frstSeen = memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + " UTC"
 
-        # get the current time in UTC and convert it to a human readable format
-        now = datetime.datetime.utcnow()
-        now = now.strftime("%Y-%m-%d %H:%M:%S")
-        now = str(now) + " UTC"
+#         # get the current time in UTC and convert it to a human readable format
+#         now = datetime.datetime.utcnow()
+#         now = now.strftime("%Y-%m-%d %H:%M:%S")
+#         now = str(now) + " UTC"
 
-        async with message.channel.typing():
+#         async with message.channel.typing():
             
-            prompt = "{username:" + aName + ", gender: " + aGender + ", first seen: " + memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + ' UTC}\nIt is currently '+ now + ', Server name: ' + guildName + '\n' + memory[author]["name"] + " (" + memory[author]["gender"] + "): " + memory[author]["message"] + "\n"+client.user.name+" (Female): " + memory[author]["response"] + "\n"+ memory[author]["name"] + " (" + memory[author]["gender"] + "): " + messageContent + "\n"+client.user.name+" (Female): "
-            memory[author]["message"] = messageContent
+#             prompt = "{username:" + aName + ", gender: " + aGender + ", first seen: " + memory[author]["definitionDOW"] + " " + memory[author]["definitiondate"] + ' UTC}\nIt is currently '+ now + ', Server name: ' + guildName + '\n' + memory[author]["name"] + " (" + memory[author]["gender"] + "): " + memory[author]["message"] + "\n"+client.user.name+" (Female): " + memory[author]["response"] + "\n"+ memory[author]["name"] + " (" + memory[author]["gender"] + "): " + messageContent + "\n"+client.user.name+" (Female): "
+#             memory[author]["message"] = messageContent
 
-            print(prompt)
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
-                n=1,
-                max_tokens=200
-            )
-            print(response.choices[0].text)
-            memory[author]["response"] = response.choices[0].text
-        # reply to the user with the response
-        if (guildName == "NOT IN SERVER. DM"):
-            await message.channel.send(response.choices[0].text)
-        else:
-            await message.channel.send(response.choices[0].text, reference=message)
-        #save memory to file with json
-        files.saveJson("memory.json", memory)
-    except:
-        await asyncErr(message, traceback.format_exc())
-        await gptWithoutMemory(message)
+#             print(prompt)
+#             response = openai.Completion.create(
+#                 engine="text-davinci-003",
+#                 prompt=prompt,
+#                 n=1,
+#                 max_tokens=200
+#             )
+#             print(response.choices[0].text)
+#             memory[author]["response"] = response.choices[0].text
+#         # reply to the user with the response
+#         if (guildName == "NOT IN SERVER. DM"):
+#             await message.channel.send(response.choices[0].text)
+#         else:
+#             await message.channel.send(response.choices[0].text, reference=message)
+#         #save memory to file with json
+#         files.saveJson("memory.json", memory)
+#     except:
+#         await asyncErr(message, traceback.format_exc())
+#         await gptWithoutMemory(message)
 
 import re
 
