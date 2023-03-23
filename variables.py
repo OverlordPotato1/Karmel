@@ -10,7 +10,7 @@ useBeta = True
 
 activate = ["Karmel, ", "Karmel,", "karmel, ", "karmel,"]
 
-discordToken = files.loadJson("tokens.json")["discord"]
+TOKEN = files.loadJson("tokens.json")["discord"]
 # if useBeta:
 #     discordToken = os.environ.get("KARMEL_PRE_API")
 # else:
