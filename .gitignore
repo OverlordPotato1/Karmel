@@ -4,3 +4,9 @@ __pycache__
 .vscode
 doing_shit_chatgpt_told_me_to_do.py
 memory.json
+__pycache__/files.cpython-311.pyc
+__pycache__/misc_functions.cpython-311.pyc
+__pycache__/OAI_Functions.cpython-311.pyc
+__pycache__/primary_activated.cpython-311.pyc
+.gitignore
+__pycache__/variables.cpython-311.pyc
