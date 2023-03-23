@@ -20,7 +20,7 @@ user = "user"
 assistant = "assistant"
 content = "content"
 
-openai.api_key = os.environ.get("OPENAI_API")
+openai.api_key = files.loadJson("tokens.json")["openai"]
 
 # encoding = tiktoken.get_encoding("gpt3.5")
 

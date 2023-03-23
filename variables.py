@@ -10,11 +10,11 @@ useBeta = True
 
 activate = ["Karmel, ", "Karmel,", "karmel, ", "karmel,"]
 
-discordToken = ""
-if useBeta:
-    discordToken = os.environ.get("KARMEL_PRE_API")
-else:
-    discordToken = os.environ.get("KARMEL_MAIN_API")
+discordToken = files.loadJson("tokens.json")["discord"]
+# if useBeta:
+#     discordToken = os.environ.get("KARMEL_PRE_API")
+# else:
+#     discordToken = os.environ.get("KARMEL_MAIN_API")
 
 openai.api_key = os.environ.get("OPENAI_API")
 
