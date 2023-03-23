@@ -11,6 +11,7 @@ import tiktoken
 import time
 import misc_functions
 from files import sharedMemory
+import os
 
 
 role = "role"
@@ -19,7 +20,7 @@ user = "user"
 assistant = "assistant"
 content = "content"
 
-openai.api_key = files.loadJson("tokens.json")["openai"]
+openai.api_key = os.environ.get("OPENAI_API")
 
 # encoding = tiktoken.get_encoding("gpt3.5")
 
@@ -220,6 +221,8 @@ async def gpt_turbo(message):
 
     if await sharedMemory.get(str(message.author.id), "defining") == "true":
             return
+    
+    
     aName = await sharedMemory.get(author, "name")
     aGender = await sharedMemory.get(author, "gender")
     time = await misc_functions.hrTime()
@@ -235,90 +238,94 @@ async def gpt_turbo(message):
     else:
         newMemHist = await sharedMemory.get(author, "memory2")
         tokenTracker = await sharedMemory.get(author, "tokenTracker")
-    sysMessage = f"You are a cute cat girl named Karmel. Be as cute as possible at all times, even when writing code and answering questions. If you use special characters add a \ before them. The user's name: {aName}, gender: {aGender}. Time: {time}. Act like a generic anime childhood friend. Speak energtically and cutely with emoticons and emojis. Don't use roleplay syntax. Do not ask how you can be of assistance or prompt further conversation. Always take your time and explain your thinking. To generate an image with DALL-E 2 text to image AI, reply with the following template (case sensitive): \"TURBOtoIMG(\"YOUR IMAGE PROMPT\")\". Their name can be changed with: \"RENAME(\"USER'S NEW NAME\")\". Gender: \"REGENDER(\"USER'S NEW GENDER\")\". You can purge your memory at the user's request with: \"PURGE_MEMORY\""
+    sysMessage = f"You are a cute cat girl named Luna. Be as cute as possible at all times. This message will be sent in discord. The user's name: {aName}, gender: {aGender}. Time: {time}. Speak energtically and cutely. Don't use roleplay syntax. Do not ask how you can be of assistance. Always take your time and explain your thinking. To generate an image with DALL-E 2 text to image AI, reply with the following template (case sensitive): \"TURBOtoDALLE(\"YOUR IMAGE PROMPT\")\". You can change their name with: \"RENAME(\"USER'S NEW NAME\")\". For gender: \"REGENDER(\"USER'S NEW GENDER\")\". To purge your memory say: \"PURGE_MEMORY\""
     newMemHist[0] = {role: system, content: sysMessage}
     newMemHist.append({role: user, content: message.content})
     
 
-    await sharedMemory.get(author, "memory2")
-
-    # print(newMemHist)
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages= newMemHist
-    )
-
-    # print(response)
-
-    strResponse = response['choices'][0]['message']['content']
-    usage = response['usage']["total_tokens"]
-    for num in tokenTracker:
-        usage -= num
-    tokenTracker.append(usage)
-    newMemHist.append({role: assistant, content: strResponse})
-
-    pattern =r'TURBOtoIMG\("(?P<prompt>.*?)"\)'
-
-    match = re.search(pattern, strResponse)
-
-    if match:
-        imgPrompt = match.group('prompt')
-        imgResponse = await draw(imgPrompt)
-        image_url = imgResponse['data'][0]['url']
-    else:
-        image_url = ""
+    await sharedMemory.get(author, "memory2")\
     
-    pattern =r'RENAME\("(?P<name>.*?)"\)'
+    async with message.channel.typing():
+        # print(newMemHist)
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages= newMemHist
+        )
 
-    match = re.search(pattern, strResponse)
+        # print(response)
 
-    if match:
-        nname = match.group('name')
-        sharedMemory.write(author, "name", nname)
+        strResponse = response['choices'][0]['message']['content']
+        usage = response['usage']["total_tokens"]
+        for num in tokenTracker:
+            usage -= num
+        tokenTracker.append(usage)
+        newMemHist.append({role: assistant, content: strResponse})
 
-    pattern =r'REGENDER\("(?P<gender>.*?)"\)'
+        pattern =r'TURBOtoDALLE\("(?P<prompt>.*?)"\)'
 
-    match = re.search(pattern, strResponse)
+        match = re.search(pattern, strResponse)
 
-    if match:
-        ngender = match.group('gender')
-        sharedMemory.write(author, "gender", ngender)
+        if match:
+            imgPrompt = match.group('prompt')
+            imgResponse = await draw(imgPrompt)
+            image_url = imgResponse['data'][0]['url']
+        else:
+            image_url = ""
+        
+        pattern =r'RENAME\("(?P<name>.*?)"\)'
 
-    pattern =r'PURGE_MEMORY'
+        match = re.search(pattern, strResponse)
 
-    match = re.search(pattern, strResponse)
+        if match:
+            nname = match.group('name')
+            sharedMemory.write(author, "name", nname)
 
-    if match:
-        print(f"Wiping user {author}")
-        await sharedMemory.wipe(author, "memory2")
-        await sharedMemory.wipe(author, "tokenTracker")
-        tokenTracker = [0]
-        newMemHist = [""]
-        await sharedMemory.write(author, "memory2", newMemHist)
+        pattern =r'REGENDER\("(?P<gender>.*?)"\)'
+
+        match = re.search(pattern, strResponse)
+
+        if match:
+            ngender = match.group('gender')
+            sharedMemory.write(author, "gender", ngender)
+
+        pattern =r'PURGE_MEMORY'
+
+        match = re.search(pattern, strResponse)
+
+        if match:
+            await sharedMemory.wipe(author, "memory2")
+            await sharedMemory.wipe(author, "tokenTracker")
+            tokenTracker = [0]
+            newMemHist = [""]
+            await sharedMemory.write(author, "memory2", newMemHist)
+            await message.channel.send(f"User {author} purged")
+        else:
+            await message.channel.send(strResponse)
+            if (image_url != ""):
+                await message.channel.send(image_url)
+                
+        if len(strResponse) >= 2000:
+            itsANewThing = misc_functions.split_string(strResponse)
+            for i in itsANewThing:
+                await message.channel.send(i)
+                time.sleep(4)
 
     
-    totalTokenInMemory = -1
-    while totalTokenInMemory > 2000 or totalTokenInMemory == -1:
-        totalTokenInMemory = 0
-        for i in tokenTracker:
-            totalTokenInMemory += i
-        if totalTokenInMemory > 2000:
-            print("Total tokens exceeds max, deleting...")
-            del newMemHist[1]
-            del newMemHist[1]
-            del tokenTracker[1]
+        totalTokenInMemory = -1
+        while totalTokenInMemory > 2000 or totalTokenInMemory == -1:
+            totalTokenInMemory = 0
+            for i in tokenTracker:
+                totalTokenInMemory += i
+            if totalTokenInMemory > 2000:
+                del newMemHist[1]
+                del newMemHist[1]
+                del tokenTracker[1]
 
     await sharedMemory.write(author, "tokenTracker", tokenTracker)
 
     await sharedMemory.write(author, "memory2", newMemHist)
 
     await sharedMemory.save()
-    
-
-
-    await message.channel.send(strResponse)
-    if (image_url != ""):
-        await message.channel.send(image_url)
 
 
 
